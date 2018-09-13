@@ -6,9 +6,9 @@ from peewee import CharField, FixedCharField
 
 from peeweeplus import MySQLDatabase, JSONModel, IPv4AddressField
 
+from macreg.config import CONFIG
 
-CONFIG = ConfigParser()
-CONFIG.read('/etc/macreg.conf')
+
 NETWORK = IPv4Network(CONFIG['network']['network'])
 DATABASE = MySQLDatabase.from_config(CONFIG['db'])
 
@@ -22,7 +22,7 @@ class NetworkExhausted(Exception):
 class MacWhitelist(JSONModel):
     """A white list for MAC addresses."""
 
-    class Meta:
+    class Meta:     # pylint: disable=C0111
         database = DATABASE
 
     user_name = CharField(255)
@@ -39,11 +39,11 @@ class MacWhitelist(JSONModel):
             yield record.ipv4address
 
     @classmethod
-    def free_ipv4address(cls, network):
+    def free_ipv4address(cls):
         """Returns the lowest freee IPv4 address."""
         ipv4addresses = set(cls.ipv4addresses())
 
-        for ipv4address in network:
+        for ipv4address in NETWORK:
             if ipv4address not in ipv4addresses:
                 return ipv4address
 
