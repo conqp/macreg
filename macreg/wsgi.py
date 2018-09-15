@@ -5,13 +5,14 @@ from uuid import UUID
 from flask import Flask, request, jsonify
 from httpam import InvalidUserNameOrPassword, SessionExpired, SessionManager
 
-from macreg.config import ADMINS
+from macreg.config import CONFIG
 from macreg.orm import NetworkExhausted, MACAddressAlreadyRegistered, MACList
 
 
 __all__ = ['APPLICATION']
 
 
+ADMINS = CONFIG.get('admins', ())
 SESSION_MANAGER = SessionManager('/etc/macreg.json')
 APPLICATION = Flask('macreg')
 

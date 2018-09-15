@@ -1,14 +1,10 @@
 """Service configuration parser."""
 
-from configparser import ConfigParser
+from json import loads
 
 
-__all__ = ['CONFIG', 'ADMINS']
+__all__ = ['CONFIG']
 
 
-CONFIG = ConfigParser()
-CONFIG[CONFIG.default_section] = {
-    'admins': ''
-}
-CONFIG.read('/etc/macreg.conf')
-ADMINS = CONFIG['wsgi']['admins'].split()
+with open('/etc/macreg.json', 'r') as file:
+    CONFIG = loads(file.read())
