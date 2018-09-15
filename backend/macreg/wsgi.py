@@ -79,10 +79,10 @@ def _already_registered(_):
 
 
 @APPLICATION.errorhandler(Exception)
-def _internal_server_error(_):
+def _internal_server_error(exception):
     """Returns an appropriate error message."""
 
-    return (format_exc(), 400)
+    return (format_exc() + '\n' + str(exception), 400)
 
 
 @APPLICATION.route('/login', methods=['POST'])
