@@ -104,7 +104,7 @@ macreg.render = function () {
     macreg._render,
     function (error) {
       console.log('Autologin failed:\n' + JSON.stringify(error));
-      window.location = 'index.html';
+      alert('Could not query MAC addresses.');
     }
   );
 };
