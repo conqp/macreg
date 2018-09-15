@@ -24,6 +24,14 @@ macreg.sessionTokenKey = 'macreg.sessionToken';
 
 
 /*
+  Returns the query arguments.
+*/
+macreg.getQueryArgs = function () {
+  return '?session=' + localStorage.getItem(macreg.sessionTokenKey);
+};
+
+
+/*
   Makes a request returning a promise.
 */
 macreg.makeRequest = function (method, url, data=null, ...headers) {
@@ -101,7 +109,7 @@ macreg._render = function (records) {
 */
 macreg.render = function () {
   document.removeEventListener('DOMContentLoaded', macreg.render);
-  return macreg.makeRequest('GET', macreg.SUBMIT_URL).then(
+  return macreg.makeRequest('GET', macreg.SUBMIT_URL + macreg.getQueryArgs()).then(
     macreg._render,
     function (error) {
       console.log('Could not query MAC addresses:\n' + JSON.stringify(error));
@@ -169,7 +177,7 @@ macreg.submit = function () {
   var payload = {'macAddress': macAddress};
   var header = ['Content-Type', 'application/json'];
   var data = JSON.stringify(payload);
-  return macreg.makeRequest('POST', macreg.SUBMIT_URL, data, header).then(
+  return macreg.makeRequest('POST', macreg.SUBMIT_URL + macreg.getQueryArgs(), data, header).then(
     macreg.render,
     function (error) {
       console.log('Could not submit MAC address:\n' + JSON.stringify(error));
