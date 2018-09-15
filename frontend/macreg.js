@@ -18,9 +18,8 @@
 
 var macreg = macreg || {};
 
-macreg.BASE_URL = '';   // !!! SET THIS !!!
-macreg.LOGIN_URL = macreg.BASE_URL + '/login';
-macreg.SUBMIT_URL = macreg.BASE_URL + '/mac';
+macreg.LOGIN_URL = 'login';
+macreg.SUBMIT_URL = 'mac';
 macreg.sessionTokenKey = 'macreg.sessionToken';
 
 
@@ -72,6 +71,7 @@ macreg.makeRequest = function (method, url, data=null, ...headers) {
   Renders the respective records.
 */
 macreg._render = function (records) {
+  console.log('Rendering records.');
   var container = document.getElementById('records');
   container.innerHTML = '';
 
@@ -104,7 +104,7 @@ macreg.render = function () {
   return macreg.makeRequest('GET', macreg.SUBMIT_URL).then(
     macreg._render,
     function (error) {
-      console.log('Autologin failed:\n' + JSON.stringify(error));
+      console.log('Could not query MAC addresses:\n' + JSON.stringify(error));
       alert('Could not query MAC addresses.');
     }
   );
@@ -128,6 +128,7 @@ macreg.autoLogin = function () {
   var data = JSON.stringify(payload);
   return macreg.makeRequest('PUT', macreg.LOGIN_URL, data, header).then(
     function (session) {
+      console.log('Successfully refreshed session.');
       localStorage.setItem(macreg.sessionTokenKey, session.token);
       macreg.render();
     },
@@ -149,6 +150,7 @@ macreg.login = function () {
   var data = JSON.stringify(payload);
   return macreg.makeRequest('POST', macreg.LOGIN_URL, data, header).then(
     function () {
+      console.log('Redirecting to submit page.');
       window.location = 'submit.html';
     },
     function (error) {
