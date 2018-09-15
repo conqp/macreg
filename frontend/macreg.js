@@ -65,7 +65,49 @@ macreg.makeRequest = function (method, url, data=null, ...headers) {
   };
 
   return new Promise(executor);
-}
+};
+
+
+/*
+  Renders the respective records.
+*/
+macreg._render = function (records) {
+  var container = document.getElementById('records');
+  container.innerHTML = '';
+
+  for (var record of records) {
+    var row = document.createElement('tr');
+    var fields = [
+      record.timestamp,
+      record.userName,
+      record.macAddress,
+      record.description,
+      record.ipv4address || 'N/A'
+    ];
+
+    for (var field of fields) {
+      var column = document.createElement('td');
+      column.textContent = field;
+      row.appendChild(column)
+    }
+
+    container.appendChild(row);
+  }
+};
+
+
+/*
+  Renders the page.
+*/
+macreg.render = function () {
+  return macreg.makeRequest('GET', macreg.SUBMIT_URL).then(
+    macreg._render,
+    function (error) {
+      console.log('Autologin failed:\n' + JSON.stringify(error));
+      window.location = 'index.html';
+    }
+  );
+};
 
 
 /*
@@ -76,19 +118,21 @@ macreg.autoLogin = function () {
 
   if (sessionToken == null) {
     console.log('No session stored.');
+    window.location = 'index.html';
     return;
   }
 
   var header = ['Content-Type', 'application/json'];
   var payload = {session: sessionToken};
   var data = JSON.stringify(payload);
-  macreg.makeRequest('PUT', macreg.LOGIN_URL, data, header).then(
+  return macreg.makeRequest('PUT', macreg.LOGIN_URL, data, header).then(
     function (session) {
       localStorage.setItem(macreg.sessionTokenKey, session.token);
-      window.location = 'submit.html';
+      macreg.render();
     },
     function (error) {
       console.log('Autologin failed:\n' + JSON.stringify(error));
+      window.location = 'index.html';
     }
   );
 };
@@ -110,6 +154,24 @@ macreg.login = function () {
     function (error) {
       console.log('Login failed:\n' + JSON.stringify(error));
       alert('Invalid user name or password.');
+    }
+  );
+};
+
+
+/*
+  Submits a new MAC address.
+*/
+macreg.submit = function () {
+  var macAddress = document.getElementById('macAddress');
+  var payload = {'macAddress': macAddress};
+  var header = ['Content-Type', 'application/json'];
+  var data = JSON.stringify(payload);
+  return macreg.makeRequest('POST', macreg.SUBMIT_URL, data, header).then(
+    macreg.render,
+    function (error) {
+      console.log('Could not submit MAC address:\n' + JSON.stringify(error));
+      alert('Could not submit MAC address.');
     }
   );
 };
