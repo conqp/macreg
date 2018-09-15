@@ -38,6 +38,12 @@ macreg.makeRequest = function (method, url, data=null, ...headers) {
   function executor (resolve, reject) {
     function onload () {
       if (this.status >= 200 && this.status < 300) {
+        try {
+          xhr.response['json'] = JSON.parse(xhr.response);
+        } catch (error) {
+          xhr.response['json'] = undefined;
+        }
+
         resolve(xhr.response);
       } else {
         reject({
