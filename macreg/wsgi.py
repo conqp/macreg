@@ -6,7 +6,10 @@ from flask import Flask, request, jsonify
 from httpam import InvalidUserNameOrPassword, SessionExpired, SessionManager
 
 from macreg.config import CONFIG
-from macreg.orm import MacWhitelist
+from macreg.orm import NetworkExhausted, MACAddressAlreadyRegistered, MACList
+
+
+__all__ = ['APPLICATION']
 
 
 SESSION_MANAGER = SessionManager('/etc/macreg.json')
@@ -46,6 +49,20 @@ def _invalid_session_id(_):
     return ('Invalid session ID.', 400)
 
 
+@APPLICATION.errorhandler(NetworkExhausted)
+def _invalid_session_id(_):
+    """Returns an appropriate error message."""
+
+    return ('No free IP addresses left.', 400)
+
+
+@APPLICATION.errorhandler(MACAddressAlreadyRegistered)
+def _invalid_session_id(_):
+    """Returns an appropriate error message."""
+
+    return ('This MAC address has already been registered.', 400)
+
+
 @APPLICATION.route('/login', methods=['POST'])
 def login():
     """Performa a login."""
@@ -53,7 +70,7 @@ def login():
     user_name = request.json.get('userName')
     passwd = request.json.get('passwd')
 
-    if user_name is None or passwd is None:
+    if not user_name or not passwd:
         return ('No user name and / or password provided.', 400)
 
     try:
@@ -71,10 +88,9 @@ def list_macs():
     user = _get_user()
 
     if user.pw_name in CONFIG['wsgi']['admins'].split():
-        records = MacWhitelist
+        records = MACList
     else:
-        records = MacWhitelist.select().where(
-            MacWhitelist.user_name == user.pw_name)
+        records = MACList.select().where(MACList.user_name == user.pw_name)
 
     return jsonify([record.to_json() for record in records])
 
@@ -84,6 +100,6 @@ def submit_mac():
     """Submit a MAC address."""
 
     user = _get_user()
-    record = MacWhitelist.from_json(user.pw_name, request.json)
+    record = MACList.from_json(request.json, user.pw_name)
     record.save()
     return 'MAC address added.'

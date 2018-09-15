@@ -9,6 +9,9 @@ from peeweeplus import MySQLDatabase, JSONModel, IPv4AddressField
 from macreg.config import CONFIG
 
 
+__all__ = ['NetworkExhausted', 'MACAddressAlreadyRegistered', 'MACList']
+
+
 NETWORK = IPv4Network(CONFIG['network']['network'])
 DATABASE = MySQLDatabase.from_config(CONFIG['db'])
 
@@ -19,18 +22,41 @@ class NetworkExhausted(Exception):
     pass
 
 
-class MacWhitelist(JSONModel):
+class MACAddressAlreadyRegistered(Exception):
+    """Indicates that the respective MAC
+    address has already been registered.
+    """
+
+    pass
+
+
+class MACList(JSONModel):
     """A white list for MAC addresses."""
 
     class Meta:     # pylint: disable=C0111
         database = DATABASE
+        table_name = 'mac_list'
 
     user_name = CharField(255)
     first_name = CharField(255)
     last_name = CharField(255)
     description = CharField(255)
-    mac_address = FixedCharField(17)
+    mac_address = FixedCharField(17, unique=True)
     ipv4address = IPv4AddressField(null=True)
+
+    @classmethod
+    def from_json(cls, json, user_name, **kwargs):
+        """Creates a new record from a JSON-ish dict."""
+        mac_address = json['dictionary']
+
+        try:
+            cls.get(cls.mac_address == mac_address)
+        except cls.DoesNotExist:
+            record = super().from_json(json, skip=['userName'], **kwargs)
+            record.user_name = user_name
+            return record
+
+        raise MACAddressAlreadyRegistered()
 
     @classmethod
     def ipv4addresses(cls):
