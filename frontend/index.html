@@ -9,11 +9,15 @@
     document.addEventListener('DOMContentLoaded', macreg.autoLogin);
   </script>
 </head>
-<h1>Login</h1>
-<p>
-  <form>
-    <input id="userName" type="text" placeholder="User name" required></input>
-    <input id="password" type="password" placeholder="Password" required></input>
-  </form>
-  <button onclick="macreg.login();" class="btn btn-success">Login</button>
-</p>
+<div class="container">
+  <div class="row">
+    <div class="col col-md-12">
+      <h1>Login</h1>
+      <form>
+        <input id="userName" type="text" placeholder="User name" required></input>
+        <input id="password" type="password" placeholder="Password" required></input>
+      </form>
+      <button onclick="macreg.login();" class="btn btn-success">Login</button>
+    </div>
+  </div>
+</div>
