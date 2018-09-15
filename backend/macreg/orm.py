@@ -13,13 +13,20 @@ from macreg.exceptions import InvalidMacAddress, AlreadyRegistered, \
     NetworkExhausted
 
 
-__all__ = ['Session', 'MACList']
+__all__ = ['create_tables', 'Session', 'MACList']
 
 
 NETWORK = IPv4Network(CONFIG['network'])
 DATABASE = MySQLDatabase.from_config(CONFIG['db'])
 MAC_PATTERN = compile('^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$')
 IGNORE_FIELDS = ('user_name', 'mac_address', 'ipv4address', 'timestamp')
+
+
+def create_tables(safe=True):
+    """Creates the respective tables."""
+
+    for model in MODELS:
+        model.create_table(safe=safe)
 
 
 class _MacRegModel(JSONModel):
@@ -91,3 +98,6 @@ class MACList(_MacRegModel):
             self.save()
 
         return self.ipv4address
+
+
+MODELS = (Session, MACList)
