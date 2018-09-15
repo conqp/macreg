@@ -1,5 +1,6 @@
 """WSGI service."""
 
+from traceback import format_exc
 from uuid import UUID
 
 from flask import Flask, request, jsonify
@@ -75,6 +76,13 @@ def _already_registered(_):
     """Returns an appropriate error message."""
 
     return ('This MAC address has already been registered.', 400)
+
+
+@APPLICATION.errorhandler(Exception)
+def _internal_server_error(_):
+    """Returns an appropriate error message."""
+
+    return (format_exc(), 400)
 
 
 @APPLICATION.route('/login', methods=['POST'])
