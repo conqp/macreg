@@ -6,7 +6,9 @@ from flask import Flask, request, jsonify
 from httpam import InvalidUserNameOrPassword, SessionExpired, SessionManager
 
 from macreg.config import CONFIG
-from macreg.orm import NetworkExhausted, MACAddressAlreadyRegistered, MACList
+from macreg.exceptions import InvalidMacAddress, AlreadyRegistered, \
+    NetworkExhausted
+from macreg.orm import MACList
 
 
 __all__ = ['APPLICATION']
@@ -50,15 +52,22 @@ def _invalid_session_id(_):
     return ('Invalid session ID.', 400)
 
 
+@APPLICATION.errorhandler(InvalidMacAddress)
+def _invalid_mac_address(_):
+    """Returns an appropriate error message."""
+
+    return ('Invalid MAC address specified.', 400)
+
+
 @APPLICATION.errorhandler(NetworkExhausted)
-def _invalid_session_id(_):
+def _network_exhausted(_):
     """Returns an appropriate error message."""
 
     return ('No free IP addresses left.', 400)
 
 
-@APPLICATION.errorhandler(MACAddressAlreadyRegistered)
-def _invalid_session_id(_):
+@APPLICATION.errorhandler(AlreadyRegistered)
+def _already_registered(_):
     """Returns an appropriate error message."""
 
     return ('This MAC address has already been registered.', 400)

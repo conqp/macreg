@@ -8,27 +8,16 @@ from peewee import CharField, FixedCharField, DateTimeField
 from peeweeplus import MySQLDatabase, JSONModel, IPv4AddressField
 
 from macreg.config import CONFIG
+from macreg.exceptions import InvalidMacAddress, AlreadyRegistered, \
+    NetworkExhausted
 
 
-__all__ = ['NetworkExhausted', 'MACAddressAlreadyRegistered', 'MACList']
+__all__ = ['MACList']
 
 
 NETWORK = IPv4Network(CONFIG['network'])
 DATABASE = MySQLDatabase.from_config(CONFIG['db'])
-
-
-class NetworkExhausted(Exception):
-    """Indicates that no more IPv4 addresses are available."""
-
-    pass
-
-
-class MACAddressAlreadyRegistered(Exception):
-    """Indicates that the respective MAC
-    address has already been registered.
-    """
-
-    pass
+MAC_PATTERN = compile('^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$')
 
 
 class MACList(JSONModel):
@@ -45,18 +34,19 @@ class MACList(JSONModel):
     timestamp = DateTimeField(default=datetime.now)
 
     @classmethod
-    def from_json(cls, json, user_name, **kwargs):
+    def add(cls, user_name, mac_address, description):
         """Creates a new record from a JSON-ish dict."""
-        mac_address = json['dictionary']
+        if MAC_PATTERN.fullmatch(mac_address) is None:
+            raise InvalidMacAddress()
 
         try:
             cls.get(cls.mac_address == mac_address)
         except cls.DoesNotExist:
-            record = super().from_json(json, skip=['userName'], **kwargs)
-            record.user_name = user_name
-            return record
+            return cls(
+                user_name=user_name, mac_address=mac_address,
+                description=description)
 
-        raise MACAddressAlreadyRegistered()
+        raise AlreadyRegistered()
 
     @classmethod
     def ipv4addresses(cls):
