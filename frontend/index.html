@@ -14,10 +14,17 @@
     <div class="col col-md-12">
       <h1>Login</h1>
       <form>
-        <input id="userName" type="text" placeholder="User name" required></input>
-        <input id="password" type="password" placeholder="Password" required></input>
+        <div class="form-group">
+          <label for="userName">User Name</label>
+          <input type="text" class="form-control" id="userName" aria-describedby="userNameHelp" placeholder="User Name">
+          <small id="userNameHelp" class="form-text text-muted">Your local user name.</small>
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" class="form-control" id="password" placeholder="Password">
+        </div>
+        <button id="btnLogin" onclick="macreg.login();" type="submit" class="btn btn-primary btn-block">Login</button>
       </form>
-      <button onclick="macreg.login();" class="btn btn-success">Login</button>
     </div>
   </div>
 </div>

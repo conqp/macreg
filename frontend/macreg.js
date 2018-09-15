@@ -113,10 +113,21 @@ macreg._render = function (records) {
 
 
 /*
+  Runs on submit.html.
+*/
+macreg.submitInit = function () {
+  document.removeEventListener('DOMContentLoaded', macreg.submitInit);
+  document.getElementById('btnSubmit').addEventListener('click', function(event){
+      event.preventDefault();
+  });
+  return macreg.render();
+};
+
+
+/*
   Renders the page.
 */
 macreg.render = function () {
-  document.removeEventListener('DOMContentLoaded', macreg.render);
   return macreg.makeRequest('GET', macreg.SUBMIT_URL + macreg.getQueryArgs()).then(
     macreg._render,
     function (error) {
@@ -132,6 +143,9 @@ macreg.render = function () {
 */
 macreg.autoLogin = function () {
   document.removeEventListener("DOMContentLoaded", macreg.autoLogin);
+  document.getElementById('btnLogin').addEventListener('click', function(event){
+      event.preventDefault();
+  });
   var sessionToken = localStorage.getItem(macreg.sessionTokenKey);
 
   if (sessionToken == null) {
@@ -181,7 +195,8 @@ macreg.login = function () {
 /*
   Submits a new MAC address.
 */
-macreg.submit = function () {
+macreg.submit = function (event) {
+  event.preventDefault();
   var macAddress = document.getElementById('macAddress').value;
   var description = document.getElementById('description').value
   var payload = {'macAddress': macAddress, 'description': description};
