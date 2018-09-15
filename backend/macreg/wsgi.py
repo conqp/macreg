@@ -82,6 +82,21 @@ def login():
     return jsonify(session)
 
 
+@APPLICATION.route('/login', methods=['PUT'])
+def refresh_session():
+    """Performa a login."""
+
+    session_id = request.json['session']
+
+    try:
+        session_id = UUID(session_id)
+    except (TypeError, ValueError):
+        raise InvalidSessionId()
+
+    session = SESSION_MANAGER.refresh(session_id)
+    return jsonify(session)
+
+
 @APPLICATION.route('/mac', methods=['GET'])
 def list_macs():
     """Lists the MAC addresses of the respective user."""

@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<head>
+  <meta charset="utf-8"/>
+  <script src="macreg.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function(event) {
+      macreg.submit.render();
+    });
+  </script>
+</head>
+<h1>Login</h1>
+<p>
+  <form>
+    <input id="userName" type="text" placeholder="User name" required></input>
+    <input id="password" type="password" placeholder="Password" required></input>
+    <button onclick="macreg.submit.login();">Login</button>
+  </form>
+</p>

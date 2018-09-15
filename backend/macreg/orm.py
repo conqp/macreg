@@ -1,8 +1,9 @@
 """Object relational mappings."""
 
+from datetime import datetime
 from ipaddress import IPv4Network
 
-from peewee import CharField, FixedCharField
+from peewee import CharField, FixedCharField, DateTimeField
 
 from peeweeplus import MySQLDatabase, JSONModel, IPv4AddressField
 
@@ -38,11 +39,10 @@ class MACList(JSONModel):
         table_name = 'mac_list'
 
     user_name = CharField(255)
-    first_name = CharField(255)
-    last_name = CharField(255)
     description = CharField(255)
     mac_address = FixedCharField(17, unique=True)
     ipv4address = IPv4AddressField(null=True)
+    timestamp = DateTimeField(default=datetime.now)
 
     @classmethod
     def from_json(cls, json, user_name, **kwargs):

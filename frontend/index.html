@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<head>
+  <meta charset="utf-8"/>
+  <script src="macreg.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function(event) {
+      macreg.submit.autoLogin();
+    });
+  </script>
+</head>
+<h1>MAC Address registration</h1>
+<p>
+  <form>
+    <input id="macAddress" type="text" placeholder="MAC address..." required></input>
+    <button onclick="macreg.submit.submit();">Submit</button>
+  </form>
+</p>
+<h2>Registered MAC addresses</h2>
+<table border=1>
+  <thead>
+    <tr id="headRow">
+      <td>Date</td>
+      <td>User name</td>
+      <td>MAC address</td>
+      <td>Description</td>
+      <td>IPv4 address</td>
+    </tr>
+  </thead>
+  <tbody id="records"></tbody>
+</table>
