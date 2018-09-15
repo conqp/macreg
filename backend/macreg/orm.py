@@ -4,8 +4,8 @@ from datetime import datetime
 from ipaddress import IPv4Network
 from re import compile
 
+from httpam import SessionMixin
 from peewee import CharField, FixedCharField, DateTimeField
-
 from peeweeplus import MySQLDatabase, JSONModel, IPv4AddressField
 
 from macreg.config import CONFIG
@@ -13,7 +13,7 @@ from macreg.exceptions import InvalidMacAddress, AlreadyRegistered, \
     NetworkExhausted
 
 
-__all__ = ['MACList']
+__all__ = ['Session', 'MACList']
 
 
 NETWORK = IPv4Network(CONFIG['network'])
@@ -22,7 +22,21 @@ MAC_PATTERN = compile('^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$')
 IGNORE_FIELDS = ('user_name', 'mac_address', 'ipv4address', 'timestamp')
 
 
-class MACList(JSONModel):
+class _MacRegModel(JSONModel):
+    """Base model."""
+
+    class Meta:     # pylint: disable=C0111
+        database = DATABASE
+
+
+class Session(_MacRegModel, SessionMixin):
+    """The session storage."""
+
+    class Meta:     # pylint: disable=C0111
+        database = DATABASE
+
+
+class MACList(_MacRegModel):
     """A white list for MAC addresses."""
 
     class Meta:     # pylint: disable=C0111

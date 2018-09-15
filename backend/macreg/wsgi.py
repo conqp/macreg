@@ -9,14 +9,14 @@ from httpam import InvalidUserNameOrPassword, SessionExpired, SessionManager
 from macreg.config import CONFIG
 from macreg.exceptions import InvalidSessionId, NotLoggedIn, \
     InvalidMacAddress, AlreadyRegistered, NetworkExhausted
-from macreg.orm import MACList
+from macreg.orm import Session, MACList
 
 
 __all__ = ['APPLICATION']
 
 
 ADMINS = CONFIG.get('admins', ())
-SESSION_MANAGER = SessionManager('/etc/macreg.json')
+SESSION_MANAGER = SessionManager(Session, config='/etc/macreg.json')
 APPLICATION = Flask('macreg')
 
 
