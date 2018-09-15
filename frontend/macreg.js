@@ -146,7 +146,7 @@ macreg.login = function () {
   var userName = document.getElementById('userName').value;
   var password = document.getElementById('password').value;
   var header = ['Content-Type', 'application/json'];
-  var payload = {userName: userName, password: password};
+  var payload = {userName: userName, passwd: password};
   var data = JSON.stringify(payload);
   return macreg.makeRequest('POST', macreg.LOGIN_URL, data, header).then(
     function () {
