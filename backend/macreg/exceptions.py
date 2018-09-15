@@ -1,6 +1,23 @@
 """Common exceptions."""
 
-__all__ = ['NetworkExhausted', 'AlreadyRegistered', 'InvalidMacAddress']
+__all__ = [
+    'InvalidSessionId',
+    'NotLoggedIn',
+    'NetworkExhausted',
+    'AlreadyRegistered',
+    'InvalidMacAddress']
+
+
+class InvalidSessionId(ValueError):
+    """Indicates an invalid value for the session ID."""
+
+    pass
+
+
+class NotLoggedIn(Exception):
+    """Indicates that the user is not logged in."""
+
+    pass
 
 
 class NetworkExhausted(Exception):

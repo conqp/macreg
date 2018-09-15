@@ -6,8 +6,8 @@ from flask import Flask, request, jsonify
 from httpam import InvalidUserNameOrPassword, SessionExpired, SessionManager
 
 from macreg.config import CONFIG
-from macreg.exceptions import InvalidMacAddress, AlreadyRegistered, \
-    NetworkExhausted
+from macreg.exceptions import InvalidSessionId, NotLoggedIn, \
+    InvalidMacAddress, AlreadyRegistered, NetworkExhausted
 from macreg.orm import MACList
 
 
@@ -19,16 +19,13 @@ SESSION_MANAGER = SessionManager('/etc/macreg.json')
 APPLICATION = Flask('macreg')
 
 
-class InvalidSessionId(ValueError):
-    """Indicates an invalid value for the session ID."""
-
-    pass
-
-
 def _get_user():
     """Returns the logged-in user."""
 
-    session_id = request.args['session']
+    try:
+        session_id = request.args['session']
+    except KeyError:
+        raise NotLoggedIn()
 
     try:
         session_id = UUID(session_id)
@@ -50,6 +47,13 @@ def _invalid_session_id(_):
     """Returns an appropriate error message."""
 
     return ('Invalid session ID.', 400)
+
+
+@APPLICATION.errorhandler(NotLoggedIn)
+def _not_logged_in(_):
+    """Returns an appropriate error message."""
+
+    return ('Not logged in.', 400)
 
 
 @APPLICATION.errorhandler(InvalidMacAddress)
