@@ -162,7 +162,7 @@ macreg.login = function () {
   var userName = document.getElementById('userName').value;
   var password = document.getElementById('password').value;
   var header = ['Content-Type', 'application/json'];
-  var payload = {userName: userName, passwd: password};
+  var payload = {'userName': userName, 'passwd': password};
   var data = JSON.stringify(payload);
   return macreg.makeRequest('POST', macreg.LOGIN_URL, data, header).then(
     function (session) {
@@ -182,8 +182,9 @@ macreg.login = function () {
   Submits a new MAC address.
 */
 macreg.submit = function () {
-  var macAddress = document.getElementById('macAddress');
-  var payload = {'macAddress': macAddress};
+  var macAddress = document.getElementById('macAddress').value;
+  var description = document.getElementById('description').value
+  var payload = {'macAddress': macAddress, 'description': description};
   var header = ['Content-Type', 'application/json'];
   var data = JSON.stringify(payload);
   return macreg.makeRequest('POST', macreg.SUBMIT_URL + macreg.getQueryArgs(), data, header).then(
