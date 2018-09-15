@@ -145,7 +145,7 @@ macreg.autoLogin = function () {
   return macreg.makeRequest('PUT', macreg.LOGIN_URL, data, header).then(
     function (session) {
       console.log('Successfully refreshed session.');
-      localStorage.setItem(macreg.sessionTokenKey, session.ident);
+      localStorage.setItem(macreg.sessionTokenKey, session.token);
       macreg.render();
     },
     function (error) {
@@ -166,7 +166,7 @@ macreg.login = function () {
   var data = JSON.stringify(payload);
   return macreg.makeRequest('POST', macreg.LOGIN_URL, data, header).then(
     function (session) {
-      localStorage.setItem(macreg.sessionTokenKey, session.ident);
+      localStorage.setItem(macreg.sessionTokenKey, session.token);
       console.log('Redirecting to submit page.');
       window.location = 'submit.html';
     },

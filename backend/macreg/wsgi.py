@@ -24,16 +24,16 @@ def _get_user():
     """Returns the logged-in user."""
 
     try:
-        session_id = request.args['session']
+        token = request.args['session']
     except KeyError:
         raise NotLoggedIn()
 
     try:
-        session_id = UUID(session_id)
+        token = UUID(token)
     except (TypeError, ValueError):
         raise InvalidSessionId()
 
-    return SESSION_MANAGER.get(session_id).user
+    return SESSION_MANAGER.get(token).user
 
 
 @APPLICATION.errorhandler(SessionExpired)
@@ -44,10 +44,10 @@ def _session_expired(_):
 
 
 @APPLICATION.errorhandler(InvalidSessionId)
-def _invalid_session_id(_):
+def _invalid_session_token(_):
     """Returns an appropriate error message."""
 
-    return ('Invalid session ID.', 400)
+    return ('Invalid session token.', 400)
 
 
 @APPLICATION.errorhandler(NotLoggedIn)
@@ -100,22 +100,22 @@ def login():
     except InvalidUserNameOrPassword:
         return ('Invalid user name or password.', 400)
 
-    return jsonify(session.to_dict())
+    return jsonify(session.to_json())
 
 
 @APPLICATION.route('/login', methods=['PUT'])
 def refresh_session():
     """Performa a login."""
 
-    session_id = request.json['session']
+    token = request.json['session']
 
     try:
-        session_id = UUID(session_id)
+        token = UUID(token)
     except (TypeError, ValueError):
         raise InvalidSessionId()
 
-    session = SESSION_MANAGER.refresh(session_id)
-    return jsonify(session.to_dict())
+    session = SESSION_MANAGER.refresh(token)
+    return jsonify(session.to_json())
 
 
 @APPLICATION.route('/mac', methods=['GET'])
