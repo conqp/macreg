@@ -79,3 +79,6 @@ class MACList(JSONModel):
         """Enables the record."""
         if self.ipv4address is None:
             self.ipv4address = type(self).free_ipv4address()
+            self.save()
+
+        return self.ipv4address

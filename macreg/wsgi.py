@@ -5,7 +5,7 @@ from uuid import UUID
 from flask import Flask, request, jsonify
 from httpam import InvalidUserNameOrPassword, SessionExpired, SessionManager
 
-from macreg.config import CONFIG
+from macreg.config import ADMINS
 from macreg.orm import NetworkExhausted, MACAddressAlreadyRegistered, MACList
 
 
@@ -87,7 +87,7 @@ def list_macs():
 
     user = _get_user()
 
-    if user.pw_name in CONFIG['wsgi']['admins'].split():
+    if user.pw_name in ADMINS:
         records = MACList
     else:
         records = MACList.select().where(MACList.user_name == user.pw_name)
@@ -103,3 +103,18 @@ def submit_mac():
     record = MACList.from_json(request.json, user.pw_name)
     record.save()
     return 'MAC address added.'
+
+
+@APPLICATION.route('/mac', methods=['PATCH'])
+def enable_mac():
+    """Submit a MAC address."""
+
+    user = _get_user()
+
+    if user.pw_name not in ADMINS:
+        return ("You're not an admininistrator. Sorry.", 403)
+
+    mac_address = request.json['macAddress']
+    record = MACList.get(MACList.mac_address == mac_address)
+    ipv4address = record.enable()
+    return f'IPv4 address assigned to MAC address: {ipv4address}.'
