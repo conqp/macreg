@@ -1,14 +1,14 @@
 """Common exceptions."""
 
 __all__ = [
-    'InvalidSessionId',
+    'InvalidSessionToken',
     'NotLoggedIn',
     'NetworkExhausted',
     'AlreadyRegistered',
     'InvalidMacAddress']
 
 
-class InvalidSessionId(ValueError):
+class InvalidSessionToken(ValueError):
     """Indicates an invalid value for the session ID."""
 
     pass

@@ -7,7 +7,7 @@ from flask import Flask, request, jsonify
 from httpam import InvalidUserNameOrPassword, SessionExpired, SessionManager
 
 from macreg.config import CONFIG
-from macreg.exceptions import InvalidSessionId, NotLoggedIn, \
+from macreg.exceptions import InvalidSessionToken, NotLoggedIn, \
     InvalidMacAddress, AlreadyRegistered, NetworkExhausted
 from macreg.orm import Session, MACList
 
@@ -31,7 +31,7 @@ def _get_user():
     try:
         token = UUID(token)
     except (TypeError, ValueError):
-        raise InvalidSessionId()
+        raise InvalidSessionToken()
 
     return SESSION_MANAGER.get(token).user
 
@@ -43,7 +43,7 @@ def _session_expired(_):
     return ('Session expired.', 400)
 
 
-@APPLICATION.errorhandler(InvalidSessionId)
+@APPLICATION.errorhandler(InvalidSessionToken)
 def _invalid_session_token(_):
     """Returns an appropriate error message."""
 
@@ -112,7 +112,7 @@ def refresh_session():
     try:
         token = UUID(token)
     except (TypeError, ValueError):
-        raise InvalidSessionId()
+        raise InvalidSessionToken()
 
     session = SESSION_MANAGER.refresh(token)
     return jsonify(session.to_json())
