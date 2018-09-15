@@ -4,27 +4,15 @@
   <script src="macreg.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function(event) {
-      macreg.submit.autoLogin();
+      macreg.submit.render();
     });
   </script>
 </head>
-<h1>MAC Address registration</h1>
+<h1>Login</h1>
 <p>
   <form>
-    <input id="macAddress" type="text" placeholder="MAC address..." required></input>
-    <button onclick="macreg.submit.submit();">Submit</button>
+    <input id="userName" type="text" placeholder="User name" required></input>
+    <input id="password" type="password" placeholder="Password" required></input>
+    <button onclick="macreg.submit.login();">Login</button>
   </form>
 </p>
-<h2>Registered MAC addresses</h2>
-<table border=1>
-  <thead>
-    <tr id="headRow">
-      <td>Date</td>
-      <td>User name</td>
-      <td>MAC address</td>
-      <td>Description</td>
-      <td>IPv4 address</td>
-    </tr>
-  </thead>
-  <tbody id="records"></tbody>
-</table>
