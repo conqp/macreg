@@ -92,7 +92,7 @@ def login():
     except InvalidUserNameOrPassword:
         return ('Invalid user name or password.', 400)
 
-    return jsonify(session)
+    return jsonify(session.to_dict())
 
 
 @APPLICATION.route('/login', methods=['PUT'])
@@ -107,7 +107,7 @@ def refresh_session():
         raise InvalidSessionId()
 
     session = SESSION_MANAGER.refresh(session_id)
-    return jsonify(session)
+    return jsonify(session.to_dict())
 
 
 @APPLICATION.route('/mac', methods=['GET'])
