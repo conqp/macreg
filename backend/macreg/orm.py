@@ -2,6 +2,7 @@
 
 from datetime import datetime
 from ipaddress import IPv4Network
+from re import compile
 
 from peewee import CharField, FixedCharField, DateTimeField
 
