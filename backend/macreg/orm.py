@@ -38,7 +38,7 @@ class MACList(JSONModel):
     @classmethod
     def from_json(cls, json, user_name, skip=IGNORE_FIELDS, **kwargs):
         """Creates a new record from a JSON-ish dict."""
-        mac_address = json.pop('mac_address')
+        mac_address = json.pop('macAddress')
 
         if MAC_PATTERN.fullmatch(mac_address) is None:
             raise InvalidMacAddress()
