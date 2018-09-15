@@ -118,7 +118,6 @@ macreg.autoLogin = function () {
 
   if (sessionToken == null) {
     console.log('No session stored.');
-    window.location = 'index.html';
     return;
   }
 
@@ -132,7 +131,6 @@ macreg.autoLogin = function () {
     },
     function (error) {
       console.log('Autologin failed:\n' + JSON.stringify(error));
-      window.location = 'index.html';
     }
   );
 };
