@@ -124,10 +124,10 @@ def list_macs():
 
     user = _get_user()
 
-    if user.pw_name in ADMINS:
+    if user in ADMINS:
         records = MACList
     else:
-        records = MACList.select().where(MACList.user_name == user.pw_name)
+        records = MACList.select().where(MACList.user_name == user)
 
     return jsonify([record.to_json() for record in records])
 
@@ -137,7 +137,7 @@ def submit_mac():
     """Submit a MAC address."""
 
     user = _get_user()
-    record = MACList.from_json(request.json, user.pw_name)
+    record = MACList.from_json(request.json, user)
     record.save()
     return 'MAC address added.'
 
@@ -148,7 +148,7 @@ def enable_mac():
 
     user = _get_user()
 
-    if user.pw_name not in ADMINS:
+    if user not in ADMINS:
         return ("You're not an admininistrator. Sorry.", 403)
 
     mac_address = request.json['macAddress']
