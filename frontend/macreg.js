@@ -157,7 +157,8 @@ macreg.login = function () {
   var payload = {userName: userName, passwd: password};
   var data = JSON.stringify(payload);
   return macreg.makeRequest('POST', macreg.LOGIN_URL, data, header).then(
-    function () {
+    function (session) {
+      localStorage.setItem(macreg.sessionTokenKey, session.token);
       console.log('Redirecting to submit page.');
       window.location = 'submit.html';
     },
