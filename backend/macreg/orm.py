@@ -19,6 +19,7 @@ __all__ = ['MACList']
 NETWORK = IPv4Network(CONFIG['network'])
 DATABASE = MySQLDatabase.from_config(CONFIG['db'])
 MAC_PATTERN = compile('^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$')
+IGNORE_FIELDS = ('user_name', 'mac_address', 'ipv4address', 'timestamp')
 
 
 class MACList(JSONModel):
@@ -35,17 +36,20 @@ class MACList(JSONModel):
     timestamp = DateTimeField(default=datetime.now)
 
     @classmethod
-    def add(cls, user_name, mac_address, description):
+    def from_json(cls, json, user_name, skip=IGNORE_FIELDS, **kwargs):
         """Creates a new record from a JSON-ish dict."""
+        mac_address = json.pop('mac_address')
+
         if MAC_PATTERN.fullmatch(mac_address) is None:
             raise InvalidMacAddress()
 
         try:
             cls.get(cls.mac_address == mac_address)
         except cls.DoesNotExist:
-            return cls(
-                user_name=user_name, mac_address=mac_address,
-                description=description)
+            record = super().from_json(json, skip=skip, **kwargs)
+            record.user_name = user_name
+            record.mac_address = mac_address
+            return record
 
         raise AlreadyRegistered()
 
