@@ -195,8 +195,7 @@ macreg.login = function () {
 /*
   Submits a new MAC address.
 */
-macreg.submit = function (event) {
-  event.preventDefault();
+macreg.submit = function () {
   var macAddress = document.getElementById('macAddress').value;
   var description = document.getElementById('description').value
   var payload = {'macAddress': macAddress, 'description': description};
