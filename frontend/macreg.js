@@ -100,6 +100,7 @@ macreg._render = function (records) {
   Renders the page.
 */
 macreg.render = function () {
+  document.removeEventListener('DOMContentLoaded', macreg.render);
   return macreg.makeRequest('GET', macreg.SUBMIT_URL).then(
     macreg._render,
     function (error) {
@@ -114,6 +115,7 @@ macreg.render = function () {
   Attempts an automatic login.
 */
 macreg.autoLogin = function () {
+  document.removeEventListener("DOMContentLoaded", macreg.autoLogin);
   var sessionToken = localStorage.getItem(macreg.sessionTokenKey);
 
   if (sessionToken == null) {
