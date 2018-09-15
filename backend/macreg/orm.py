@@ -4,7 +4,7 @@ from datetime import datetime
 from ipaddress import IPv4Network
 from re import compile
 
-from httpam import SessionMixin
+from httpam import SessionBase
 from peewee import CharField, FixedCharField, DateTimeField
 from peeweeplus import MySQLDatabase, JSONModel, IPv4AddressField
 
@@ -29,7 +29,7 @@ class _MacRegModel(JSONModel):
         database = DATABASE
 
 
-class Session(_MacRegModel, SessionMixin):
+class Session(_MacRegModel, SessionBase):
     """The session storage."""
 
     class Meta:     # pylint: disable=C0111
