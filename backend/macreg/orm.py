@@ -13,7 +13,7 @@ from macreg.config import CONFIG
 __all__ = ['NetworkExhausted', 'MACAddressAlreadyRegistered', 'MACList']
 
 
-NETWORK = IPv4Network(CONFIG['network']['network'])
+NETWORK = IPv4Network(CONFIG['network'])
 DATABASE = MySQLDatabase.from_config(CONFIG['db'])
 
 
