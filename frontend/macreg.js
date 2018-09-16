@@ -92,12 +92,12 @@ macreg.makeRequest = function (method, url, data=null, ...headers) {
 /*
   Renders the respective records.
 */
-macreg._render = function (records) {
+macreg._render = function (response) {
   console.log('Rendering records.');
   var container = document.getElementById('records');
   container.innerHTML = '';
 
-  for (var record of records) {
+  for (var record of response.response) {
     var row = document.createElement('tr');
     var fields = [
       record.timestamp,
