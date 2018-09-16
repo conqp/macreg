@@ -141,7 +141,7 @@ macreg.render = function () {
 
       if (error.status == 410) {
         window.location = 'index.html';
-        alert(response.response);
+        alert(error.response);
       }
     }
   );
@@ -169,7 +169,8 @@ macreg.autoLogin = function () {
   return macreg.makeRequest('PUT', macreg.LOGIN_URL, data, header).then(
     function (response) {
       console.log('Successfully refreshed session.');
-      localStorage.setItem(macreg.sessionTokenKey, response.response.token);
+      var session = response.response;
+      localStorage.setItem(macreg.sessionTokenKey, session.token);
       macreg.render();
     },
     function (error) {
@@ -190,13 +191,15 @@ macreg.login = function () {
   var data = JSON.stringify(payload);
   return macreg.makeRequest('POST', macreg.LOGIN_URL, data, header).then(
     function (response) {
-      localStorage.setItem(macreg.sessionTokenKey, response.response.token);
+      console.log('Successfully logged in.');
+      var session = response.response;
+      localStorage.setItem(macreg.sessionTokenKey, session.token);
       console.log('Redirecting to submit page.');
       window.location = 'submit.html';
     },
     function (error) {
       console.log('Login failed:\n' + JSON.stringify(error));
-      alert('Invalid user name or password.');
+      alert(error.response);
     }
   );
 };
@@ -212,10 +215,16 @@ macreg.submit = function () {
   var header = ['Content-Type', 'application/json'];
   var data = JSON.stringify(payload);
   return macreg.makeRequest('POST', macreg.SUBMIT_URL + macreg.getQueryArgs(), data, header).then(
-    macreg.render,
+    function(response) {
+      var form = document.getElementById('submitForm');
+      form.reset();
+      macreg.render().then(function () {
+        alert(response.response);
+      });
+    },
     function (error) {
       console.log('Could not submit MAC address:\n' + JSON.stringify(error));
-      alert('Could not submit MAC address.');
+      alert(error.response);
     }
   );
 };
