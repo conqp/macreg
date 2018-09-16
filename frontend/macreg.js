@@ -138,8 +138,11 @@ macreg.render = function () {
     macreg._render,
     function (error) {
       console.log('Could not query MAC addresses:\n' + JSON.stringify(error));
-      window.location = 'index.html';
-      alert('Your session has timed out.');
+
+      if (error.status == 410) {
+        window.location = 'index.html';
+        alert(response.response);
+      }
     }
   );
 };

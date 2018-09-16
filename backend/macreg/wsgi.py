@@ -40,7 +40,7 @@ def _get_user():
 def _session_expired(_):
     """Returns an appropriate error message."""
 
-    return ('Session expired.', 400)
+    return ('Session expired.', 410)
 
 
 @APPLICATION.errorhandler(InvalidSessionToken)
@@ -82,7 +82,7 @@ def _already_registered(_):
 def _internal_server_error(exception):
     """Returns an appropriate error message."""
 
-    return (format_exc() + '\n' + str(exception), 400)
+    return (format_exc() + '\n' + str(exception), 500)
 
 
 @APPLICATION.route('/login', methods=['POST'])
