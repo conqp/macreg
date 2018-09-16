@@ -4,7 +4,7 @@ from traceback import format_exc
 from uuid import UUID
 
 from flask import Flask, request, jsonify
-from httpam import InvalidUserNameOrPassword, SessionExpired, SessionManager
+from httpam import AuthenticationError, SessionExpired, SessionManager
 
 from macreg.config import CONFIG
 from macreg.exceptions import InvalidSessionToken, NotLoggedIn, \
@@ -97,7 +97,7 @@ def login():
 
     try:
         session = SESSION_MANAGER.login(user_name, passwd)
-    except InvalidUserNameOrPassword:
+    except AuthenticationError:
         return ('Invalid user name or password.', 400)
 
     return jsonify(session.to_json())
