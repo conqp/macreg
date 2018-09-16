@@ -35,20 +35,25 @@ macreg.getQueryArgs = function () {
   Makes a request returning a promise.
 */
 macreg.makeRequest = function (method, url, data=null, ...headers) {
+  function parseResponse (response) {
+    try {
+      return JSON.parse(response);
+    } catch (error) {
+      return response;
+    }
+  };
+
   function executor (resolve, reject) {
     function onload () {
       if (this.status >= 200 && this.status < 300) {
-        var response;
-
-        try {
-          response = JSON.parse(xhr.response);
-        } catch (error) {
-          response = xhr.response;
-        }
-
-        resolve(response);
+        resolve({
+          response: parseResponse(xhr.response),
+          status: this.status,
+          statusText: xhr.statusText
+        });
       } else {
         reject({
+          response: parseResponse(xhr.response),
           status: this.status,
           statusText: xhr.statusText
         });
@@ -57,9 +62,10 @@ macreg.makeRequest = function (method, url, data=null, ...headers) {
 
     function onerror () {
       reject({
-        status: this.status,
-        statusText: xhr.statusText
-      });
+          response: parseResponse(xhr.response),
+          status: this.status,
+          statusText: xhr.statusText
+        });
     };
 
     var xhr = new XMLHttpRequest();
@@ -132,7 +138,8 @@ macreg.render = function () {
     macreg._render,
     function (error) {
       console.log('Could not query MAC addresses:\n' + JSON.stringify(error));
-      alert('Could not query MAC addresses.');
+      window.location = 'index.html';
+      alert('Your session has timed out.');
     }
   );
 };
@@ -157,9 +164,9 @@ macreg.autoLogin = function () {
   var payload = {session: sessionToken};
   var data = JSON.stringify(payload);
   return macreg.makeRequest('PUT', macreg.LOGIN_URL, data, header).then(
-    function (session) {
+    function (response) {
       console.log('Successfully refreshed session.');
-      localStorage.setItem(macreg.sessionTokenKey, session.token);
+      localStorage.setItem(macreg.sessionTokenKey, response.response.token);
       macreg.render();
     },
     function (error) {
@@ -179,8 +186,8 @@ macreg.login = function () {
   var payload = {'userName': userName, 'passwd': password};
   var data = JSON.stringify(payload);
   return macreg.makeRequest('POST', macreg.LOGIN_URL, data, header).then(
-    function (session) {
-      localStorage.setItem(macreg.sessionTokenKey, session.token);
+    function (response) {
+      localStorage.setItem(macreg.sessionTokenKey, response.response.token);
       console.log('Redirecting to submit page.');
       window.location = 'submit.html';
     },
