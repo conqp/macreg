@@ -218,9 +218,7 @@ macreg.submit = function () {
     function(response) {
       var form = document.getElementById('submitForm');
       form.reset();
-      macreg.render().then(function () {
-        alert(response.response);
-      });
+      macreg.render();
     },
     function (error) {
       console.log('Could not submit MAC address:\n' + JSON.stringify(error));
