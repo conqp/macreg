@@ -140,6 +140,7 @@ macreg.render = function () {
       console.log('Could not query MAC addresses:\n' + JSON.stringify(error));
 
       if (error.status == 410) {
+        // Session expired.
         window.location = 'index.html';
         alert(error.response);
       }
@@ -222,8 +223,14 @@ macreg.submit = function () {
       macreg.render();
     },
     function (error) {
-      console.log('Could not submit MAC address:\n' + JSON.stringify(error));
-      alert(error.response);
+      if (error.status == 410) {
+        // Session expired.
+        window.location = 'index.html';
+        alert(error.response);
+      } else {
+        onsole.log('Could not submit MAC address:\n' + JSON.stringify(error));
+        alert(error.response);
+      }
     }
   );
 };
