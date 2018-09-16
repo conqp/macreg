@@ -171,7 +171,8 @@ macreg.autoLogin = function () {
       console.log('Successfully refreshed session.');
       var session = response.response;
       localStorage.setItem(macreg.sessionTokenKey, session.token);
-      macreg.render();
+      console.log('Redirectoing to submit page.');
+      window.location = 'submit.html';
     },
     function (error) {
       console.log('Autologin failed:\n' + JSON.stringify(error));
