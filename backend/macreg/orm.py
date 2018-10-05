@@ -22,11 +22,11 @@ NETWORK = IPv4Network(CONFIG['network'])
 DATABASE = MySQLDatabase.from_config(CONFIG['db'])
 MAC_PATTERN = compile('^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$')
 IGNORE_FIELDS = ('user_name', 'mac_address', 'ipv4address', 'timestamp')
-DHCPD_TEMPLATE = '''%(comment)s
-host %(name)s {
-    hardware ethernet %(mac_address)s;
-    fixed-address %(ipv4address)s;
-}'''
+DHCPD_TEMPLATE = '''{comment}
+host {name} {{
+    hardware ethernet {mac_address};
+    fixed-address {ipv4address};
+}}'''
 
 
 def create_tables(safe=True):
