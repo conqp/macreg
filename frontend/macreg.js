@@ -123,7 +123,7 @@ macreg._render = function (response) {
 */
 macreg.submitInit = function () {
   document.removeEventListener('DOMContentLoaded', macreg.submitInit);
-  document.getElementById('btnSubmit').addEventListener('click', function(event){
+  document.getElementById('btnSubmit').addEventListener('click', function(event) {
       event.preventDefault();
   });
   return macreg.render();
@@ -154,7 +154,7 @@ macreg.render = function () {
 */
 macreg.autoLogin = function () {
   document.removeEventListener("DOMContentLoaded", macreg.autoLogin);
-  document.getElementById('btnLogin').addEventListener('click', function(event){
+  document.getElementById('btnLogin').addEventListener('click', function(event) {
       event.preventDefault();
   });
   var sessionToken = localStorage.getItem(macreg.sessionTokenKey);
