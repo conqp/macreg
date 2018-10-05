@@ -99,6 +99,16 @@ class MACList(_MacRegModel):
 
         raise NetworkExhausted()
 
+    @classmethod
+    def enabled(cls):
+        """Yields enabled records."""
+        return cls.select().where(~ cls.ipv4address >> None)
+
+    @classmethod
+    def dhcpd_conf(cls):
+        """Returns an appropriate dhcpd.conf."""
+        '\n\n'.join(record.to_dhcpd() for record in cls.enabled())
+
     @property
     def name(self):
         """Returns a unique name for this record."""
