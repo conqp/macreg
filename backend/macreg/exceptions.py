@@ -6,7 +6,8 @@ __all__ = [
     'NotLoggedIn',
     'NetworkExhausted',
     'AlreadyRegistered',
-    'InvalidMacAddress']
+    'InvalidMacAddress',
+    'NotActivated']
 
 
 class InvalidSessionToken(ValueError):
@@ -37,5 +38,13 @@ class AlreadyRegistered(Exception):
 
 class InvalidMacAddress(Exception):
     """Indicates that an invalid mac address has been provided."""
+
+    pass
+
+
+class NotActivated(Exception):
+    """Indicates that the registered MAC
+    address has not yet been activated.
+    """
 
     pass

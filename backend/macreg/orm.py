@@ -12,6 +12,7 @@ from macreg.config import CONFIG
 from macreg.exceptions import AlreadyRegistered
 from macreg.exceptions import InvalidMacAddress
 from macreg.exceptions import NetworkExhausted
+from macreg.exceptions import NotActivated
 from macreg.functions import comment
 
 
@@ -118,6 +119,9 @@ class MACList(_MacRegModel):
 
     def to_dhcpd(self):
         """Returns a string for a dhcpd.conf file entry."""
+        if self.ipv4address is None:
+            raise NotActivated()
+
         return DHCPD_TEMPLATE.format(
             comment=self.comment, name=self.name,
             mac_address=self.mac_address, ipv4address=self.ipv4address)
