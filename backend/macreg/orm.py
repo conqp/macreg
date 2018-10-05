@@ -101,7 +101,7 @@ class MACList(_MacRegModel):
     @property
     def name(self):
         """Returns a unique name for this record."""
-        return f'{self.user_name}_{self.id}'
+        return f'{self.user_name}-{self.id}'
 
     @property
     def comment(self):
