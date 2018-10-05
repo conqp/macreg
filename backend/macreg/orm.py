@@ -107,7 +107,7 @@ class MACList(_MacRegModel):
     @classmethod
     def dhcpd_conf(cls):
         """Returns an appropriate dhcpd.conf."""
-        '\n\n'.join(record.to_dhcpd() for record in cls.enabled())
+        return '\n\n'.join(record.to_dhcpd() for record in cls.enabled())
 
     @property
     def name(self):
