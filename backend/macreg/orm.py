@@ -5,12 +5,14 @@ from ipaddress import IPv4Network
 from re import compile
 
 from httpam import SessionBase
-from peewee import CharField, FixedCharField, DateTimeField
-from peeweeplus import MySQLDatabase, JSONModel, IPv4AddressField
+from peewee import CharField, DateTimeField, FixedCharField
+from peeweeplus import IPv4AddressField, JSONModel, MySQLDatabase
 
 from macreg.config import CONFIG
-from macreg.exceptions import InvalidMacAddress, AlreadyRegistered, \
-    NetworkExhausted
+from macreg.exceptions import AlreadyRegistered
+from macreg.exceptions import InvalidMacAddress
+from macreg.exceptions import NetworkExhausted
+from macreg.functions import comment
 
 
 __all__ = ['create_tables', 'Session', 'MACList']
@@ -20,6 +22,11 @@ NETWORK = IPv4Network(CONFIG['network'])
 DATABASE = MySQLDatabase.from_config(CONFIG['db'])
 MAC_PATTERN = compile('^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$')
 IGNORE_FIELDS = ('user_name', 'mac_address', 'ipv4address', 'timestamp')
+DHCPD_TEMPLATE = '''%(comment)s
+host %(name)s {
+    hardware ethernet %(mac_address)s;
+    fixed-address %(ipv4address)s;
+}'''
 
 
 def create_tables(safe=True):
@@ -50,7 +57,7 @@ class MACList(_MacRegModel):
         database = DATABASE
         table_name = 'mac_list'
 
-    user_name = CharField(255)
+    user_name = CharField(255, unique=True)
     description = CharField(255)
     mac_address = FixedCharField(17, unique=True)
     ipv4address = IPv4AddressField(null=True)
@@ -65,7 +72,7 @@ class MACList(_MacRegModel):
             raise InvalidMacAddress()
 
         try:
-            cls.get(cls.mac_address == mac_address)
+            record = cls.get(cls.mac_address == mac_address)
         except cls.DoesNotExist:
             record = super().from_json(json, skip=skip, **kwargs)
             record.user_name = user_name
@@ -91,6 +98,16 @@ class MACList(_MacRegModel):
 
         raise NetworkExhausted()
 
+    @property
+    def name(self):
+        """Returns a unique name for this record."""
+        return f'{self.user_name}_{self.id}'
+
+    @property
+    def comment(self):
+        """Returns a comment for this record."""
+        return f'# {self.timestamp}\n' + comment(self.description)
+
     def enable(self):
         """Enables the record."""
         if self.ipv4address is None:
@@ -98,6 +115,12 @@ class MACList(_MacRegModel):
             self.save()
 
         return self.ipv4address
+
+    def to_dhcpd(self):
+        """Returns a string for a dhcpd.conf file entry."""
+        return DHCPD_TEMPLATE.format(
+            comment=self.comment, name=self.name,
+            mac_address=self.mac_address, ipv4address=self.ipv4address)
 
 
 MODELS = (Session, MACList)

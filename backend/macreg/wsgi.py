@@ -7,8 +7,11 @@ from flask import Flask, request, jsonify
 from httpam import AuthenticationError, SessionExpired, SessionManager
 
 from macreg.config import CONFIG
-from macreg.exceptions import InvalidSessionToken, NotLoggedIn, \
-    InvalidMacAddress, AlreadyRegistered, NetworkExhausted
+from macreg.exceptions import AlreadyRegistered
+from macreg.exceptions import InvalidMacAddress
+from macreg.exceptions import InvalidSessionToken
+from macreg.exceptions import NetworkExhausted
+from macreg.exceptions import NotLoggedIn
 from macreg.orm import Session, MACList
 
 

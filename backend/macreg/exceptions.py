@@ -1,5 +1,6 @@
 """Common exceptions."""
 
+
 __all__ = [
     'InvalidSessionToken',
     'NotLoggedIn',
