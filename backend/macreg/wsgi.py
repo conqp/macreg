@@ -33,7 +33,7 @@ def _get_user():
 
     try:
         token = UUID(token)
-    except (TypeError, ValueError):
+    except ValueError:
         raise InvalidSessionToken()
 
     return SESSION_MANAGER.get(token).user

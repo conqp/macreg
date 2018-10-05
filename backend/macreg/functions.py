@@ -4,7 +4,7 @@
 __all__ = ['comment']
 
 
-def comment_lines(string):
+def _comment_lines(string):
     """Normalizes a string for compliance
     with dhcpd.conf comments.
     """
@@ -17,4 +17,4 @@ def comment_lines(string):
 def comment(string):
     """Converts a string to dhcpd.conf comment lines."""
 
-    return '\n'.join(comment_lines(string))
+    return '\n'.join(_comment_lines(string))

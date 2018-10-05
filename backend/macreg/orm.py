@@ -2,7 +2,7 @@
 
 from datetime import datetime
 from ipaddress import IPv4Network
-from re import compile
+from re import compile  # pylint: disable=W0622
 
 from httpam import SessionBase
 from peewee import CharField, DateTimeField, FixedCharField
@@ -40,21 +40,21 @@ def create_tables(safe=True):
 class _MacRegModel(JSONModel):
     """Base model."""
 
-    class Meta:     # pylint: disable=C0111
+    class Meta:     # pylint: disable=C0111,R0903
         database = DATABASE
 
 
 class Session(_MacRegModel, SessionBase):
     """The session storage."""
 
-    class Meta:     # pylint: disable=C0111
+    class Meta:     # pylint: disable=C0111,R0903
         database = DATABASE
 
 
 class MACList(_MacRegModel):
     """A white list for MAC addresses."""
 
-    class Meta:     # pylint: disable=C0111
+    class Meta:     # pylint: disable=C0111,R0903
         database = DATABASE
         table_name = 'mac_list'
 
