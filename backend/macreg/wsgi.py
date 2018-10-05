@@ -1,5 +1,7 @@
 """WSGI service."""
 
+from logging import getLogger
+from tempfile import NamedTemporaryFile
 from traceback import format_exc
 from uuid import UUID
 
@@ -19,8 +21,9 @@ __all__ = ['APPLICATION']
 
 
 ADMINS = CONFIG.get('admins', ())
-SESSION_MANAGER = SessionManager(Session, config='/etc/macreg.json')
 APPLICATION = Flask('macreg')
+LOGGER = getLogger(__file__)
+SESSION_MANAGER = SessionManager(Session, config='/etc/macreg.json')
 
 
 def _get_user():
@@ -85,7 +88,15 @@ def _already_registered(_):
 def _internal_server_error(exception):
     """Returns an appropriate error message."""
 
-    return (format_exc() + '\n' + str(exception), 500)
+    with NamedTemporaryFile(
+            mode='w', prefix='macreg_', suffix='.stacktrace',
+            delete=False) as tmp:
+        tmp.write(format_exc())
+        tmp.write('\n')
+        tmp.write(str(exception))
+
+    LOGGER.error('Stacktrace written to "%s".', tmp.name)
+    return ('Internal server error.', 500)
 
 
 @APPLICATION.route('/login', methods=['POST'])
