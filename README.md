@@ -1,5 +1,6 @@
 # macreg
-A micro web service to allow local users to register MAC addresses for their devices.
+A micro web service to allow local users to register MAC addresses for their  
+devices and administrators to generate a dhcpd.conf file from the records.
 
 # License
 macreg
