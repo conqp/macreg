@@ -2,10 +2,16 @@
 
 from datetime import datetime
 from ipaddress import IPv4Network
+from itertools import chain
+from os import linesep
 from re import compile  # pylint: disable=W0622
+from uuid import uuid4
 
-from httpam import SessionBase
-from peewee import CharField, DateTimeField, FixedCharField
+from httpam import NoSuchSession
+from peewee import CharField
+from peewee import DateTimeField
+from peewee import FixedCharField
+from peewee import UUIDField
 from peeweeplus import IPv4AddressField, JSONModel, MySQLDatabase
 
 from macreg.config import CONFIG
@@ -27,7 +33,7 @@ host {name} {{
 }}'''
 IGNORE_FIELDS = ('user_name', 'mac_address', 'ipv4address', 'timestamp')
 MAC_PATTERN = compile('^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$')
-NETWORK = IPv4Network(CONFIG['network'])
+NETWORK = IPv4Network(CONFIG['network']['network'])
 
 
 def create_tables(safe=True):
@@ -44,11 +50,53 @@ class _MacRegModel(JSONModel):
         database = DATABASE
 
 
-class Session(_MacRegModel, SessionBase):
+class Session(_MacRegModel):
     """The session storage."""
 
     class Meta:     # pylint: disable=C0111,R0903
         database = DATABASE
+
+    token = UUIDField(default=uuid4)
+    user = CharField(255)
+    start = DateTimeField(default=datetime.now)
+    end = DateTimeField()
+
+    @classmethod
+    def open(cls, user, duration):
+        """Opens a session for the respective user."""
+        session = cls()
+        session.user = user.pw_name
+        session.end = datetime.now() + duration
+        session.save()
+        return session
+
+    @classmethod
+    def by_token(cls, token):
+        """Returns a session by its token."""
+        try:
+            return cls.get(cls.token == token)
+        except cls.DoesNotExist:
+            raise NoSuchSession()
+
+    @classmethod
+    def by_user(cls, user):
+        """Yields sessions of the respective user."""
+        return cls.select().where(cls.user == user.pw_name)
+
+    @property
+    def valid(self):
+        """Validates the session."""
+        return self.start <= datetime.now() <= self.end
+
+    def refresh(self, duration):
+        """Renews a session."""
+        self.end = datetime.now() + duration
+        self.save()
+        return self
+
+    def close(self):
+        """Closes the session."""
+        return self.delete_instance()
 
 
 class MACList(_MacRegModel):
@@ -91,7 +139,7 @@ class MACList(_MacRegModel):
     @classmethod
     def free_ipv4address(cls):
         """Returns the lowest freee IPv4 address."""
-        ipv4addresses = set(cls.ipv4addresses())
+        ipv4addresses = frozenset(cls.ipv4addresses())
 
         for ipv4address in NETWORK:
             if ipv4address not in ipv4addresses:
@@ -105,9 +153,12 @@ class MACList(_MacRegModel):
         return cls.select().where(~ cls.ipv4address >> None)
 
     @classmethod
-    def dhcpd_conf(cls):
+    def dhcpd_conf(cls, prefix=None, suffix=None, spacing=2*linesep):
         """Returns an appropriate dhcpd.conf."""
-        return '\n\n'.join(record.to_dhcpd() for record in cls.enabled())
+        prefix = () if prefix is None else (prefix,)
+        suffix = () if suffix is None else (suffix,)
+        records = (record.to_dhcpd() for record in cls.enabled())
+        return spacing.join(chain(prefix, records, suffix))
 
     @property
     def name(self):
@@ -135,6 +186,10 @@ class MACList(_MacRegModel):
         return DHCPD_TEMPLATE.format(
             comment=self.comment, name=self.name,
             mac_address=self.mac_address, ipv4address=self.ipv4address)
+
+    def email(self):
+        """Sends this record via email."""
+
 
 
 MODELS = (Session, MACList)

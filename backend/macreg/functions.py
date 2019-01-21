@@ -1,5 +1,7 @@
 """Common functions."""
 
+from os import linesep
+
 
 __all__ = ['comment']
 
@@ -9,7 +11,7 @@ def _comment_lines(string):
     with dhcpd.conf comments.
     """
 
-    for line in string.split('\n'):
+    for line in string.split(linesep):
         line = line.strip()
         yield f'# {line}'
 

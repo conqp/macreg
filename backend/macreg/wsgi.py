@@ -20,33 +20,38 @@ from macreg.orm import Session, MACList
 __all__ = ['APPLICATION']
 
 
-ADMINS = CONFIG.get('admins', ())
 APPLICATION = Flask('macreg')
 LOGGER = getLogger(__file__)
 SESSION_MANAGER = SessionManager(Session, config='/etc/macreg.json')
 
 
-def _get_user():
-    """Returns the logged-in user."""
+def _get_session():
+    """Returns the current session."""
 
     try:
-        token = request.args['session']
+        token = request.cookies['session']
     except KeyError:
         raise NotLoggedIn()
 
     try:
         token = UUID(token)
     except ValueError:
-        raise InvalidSessionToken()
+        raise SessionExpired()
 
-    return SESSION_MANAGER.get(token).user
+    return SESSION_MANAGER.get(token)
+
+
+def _get_user():
+    """Returns the logged-in user."""
+
+    return _get_session().user
 
 
 @APPLICATION.errorhandler(SessionExpired)
 def _session_expired(_):
     """Returns an appropriate error message."""
 
-    return ('Session expired.', 410)
+    return ('Session expired.', 401)
 
 
 @APPLICATION.errorhandler(InvalidSessionToken)
@@ -99,6 +104,14 @@ def _internal_server_error(exception):
     return ('Internal server error.', 500)
 
 
+@APPLICATION.after_request
+def _set_cookie(response):
+    """Sets session cookie on the response."""
+
+    response.set_cookie('session', _get_session().token.hex)
+    return response
+
+
 @APPLICATION.route('/login', methods=['POST'])
 def login():
     """Performa a login."""
@@ -138,7 +151,7 @@ def list_macs():
 
     user = _get_user()
 
-    if user in ADMINS:
+    if user in CONFIG.get('admins', ()):
         records = MACList
     else:
         records = MACList.select().where(MACList.user_name == user)
@@ -153,6 +166,7 @@ def submit_mac():
     user = _get_user()
     record = MACList.from_json(request.json, user)
     record.save()
+    record.email()
     return 'MAC address added.'
 
 
@@ -162,7 +176,7 @@ def enable_mac():
 
     user = _get_user()
 
-    if user not in ADMINS:
+    if user not in CONFIG.get('admins', ()):
         return ("You're not an admininistrator. Sorry.", 403)
 
     mac_address = request.json['macAddress']

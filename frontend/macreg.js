@@ -20,72 +20,63 @@ var macreg = macreg || {};
 
 macreg.LOGIN_URL = 'login';
 macreg.SUBMIT_URL = 'mac';
-macreg.sessionTokenKey = 'macreg.sessionToken';
-
-
-/*
-  Returns the query arguments.
-*/
-macreg.getQueryArgs = function () {
-  return '?session=' + localStorage.getItem(macreg.sessionTokenKey);
-};
 
 
 /*
   Makes a request returning a promise.
 */
 macreg.makeRequest = function (method, url, data=null, ...headers) {
-  function parseResponse (response) {
-    try {
-      return JSON.parse(response);
-    } catch (error) {
-      return response;
-    }
-  };
-
-  function executor (resolve, reject) {
-    function onload () {
-      if (this.status >= 200 && this.status < 300) {
-        resolve({
-          response: parseResponse(xhr.response),
-          status: this.status,
-          statusText: xhr.statusText
-        });
-      } else {
-        reject({
-          response: parseResponse(xhr.response),
-          status: this.status,
-          statusText: xhr.statusText
-        });
-      }
+    function parseResponse (response) {
+        try {
+            return JSON.parse(response);
+        } catch (error) {
+            return response;
+        }
     };
 
-    function onerror () {
-      reject({
-          response: parseResponse(xhr.response),
-          status: this.status,
-          statusText: xhr.statusText
-        });
+    function executor (resolve, reject) {
+        function onload () {
+            if (this.status >= 200 && this.status < 300) {
+                resolve({
+                    response: parseResponse(xhr.response),
+                    status: this.status,
+                    statusText: xhr.statusText
+                });
+            } else {
+                reject({
+                    response: parseResponse(xhr.response),
+                    status: this.status,
+                    statusText: xhr.statusText
+                });
+            }
+        };
+
+        function onerror () {
+            reject({
+                response: parseResponse(xhr.response),
+                status: this.status,
+                statusText: xhr.statusText
+            });
+        };
+
+        const xhr = new XMLHttpRequest();
+        xhr.open(method, url);
+
+        for (let header of headers) {
+            xhr.setRequestHeader(...header);
+        }
+
+        xhr.onload = onload;
+        xhr.onerror = onerror;
+
+        if (data == null) {
+            xhr.send();
+        } else {
+            xhr.send(data);
+        }
     };
 
-    var xhr = new XMLHttpRequest();
-    xhr.open(method, url);
-
-    for (var header of headers) {
-      xhr.setRequestHeader(...header);
-    }
-
-    xhr.onload = onload;
-    xhr.onerror = onerror;
-
-    if (data == null) {
-      xhr.send();
-    } else {
-      xhr.send(data);
-    }
-  };
-
-  return new Promise(executor);
+    return new Promise(executor);
 };
 
 
@@ -93,28 +84,28 @@ macreg.makeRequest = function (method, url, data=null, ...headers) {
   Renders the respective records.
 */
 macreg._render = function (response) {
-  console.log('Rendering records.');
-  var container = document.getElementById('records');
-  container.innerHTML = '';
+    console.log('Rendering records.');
+    const container = document.getElementById('records');
+    container.innerHTML = '';
 
-  for (var record of response.response) {
-    var row = document.createElement('tr');
-    var fields = [
-      record.timestamp,
-      record.userName,
-      record.macAddress,
-      record.description,
-      record.ipv4address || 'N/A'
-    ];
+    for (let record of response.response) {
+        let row = document.createElement('tr');
+        let fields = [
+            record.timestamp,
+            record.userName,
+            record.macAddress,
+            record.description,
+            record.ipv4address || 'N/A'
+        ];
 
-    for (var field of fields) {
-      var column = document.createElement('td');
-      column.textContent = field;
-      row.appendChild(column)
+        for (let field of fields) {
+            let column = document.createElement('td');
+            column.textContent = field;
+            row.appendChild(column)
+        }
+
+        container.appendChild(row);
     }
-
-    container.appendChild(row);
-  }
 };
 
 
@@ -122,11 +113,11 @@ macreg._render = function (response) {
   Runs on submit.html.
 */
 macreg.submitInit = function () {
-  document.removeEventListener('DOMContentLoaded', macreg.submitInit);
-  document.getElementById('btnSubmit').addEventListener('click', function(event) {
-      event.preventDefault();
-  });
-  return macreg.render();
+    document.removeEventListener('DOMContentLoaded', macreg.submitInit);
+    document.getElementById('btnSubmit').addEventListener('click', function(event) {
+        event.preventDefault();
+    });
+    return macreg.render();
 };
 
 
@@ -134,18 +125,18 @@ macreg.submitInit = function () {
   Renders the page.
 */
 macreg.render = function () {
-  return macreg.makeRequest('GET', macreg.SUBMIT_URL + macreg.getQueryArgs()).then(
-    macreg._render,
-    function (error) {
-      console.log('Could not query MAC addresses:\n' + JSON.stringify(error));
+    return macreg.makeRequest('GET', macreg.SUBMIT_URL).then(
+        macreg._render,
+        function (error) {
+            console.log('Could not query MAC addresses:\n' + JSON.stringify(error));
 
-      if (error.status == 410) {
-        // Session expired.
-        window.location = 'index.html';
-        alert(error.response);
-      }
-    }
-  );
+            if (error.status == 401) {
+                // Session expired.
+                window.location = 'index.html';
+                alert(error.response);
+            }
+        }
+    );
 };
 
 
@@ -153,32 +144,24 @@ macreg.render = function () {
   Attempts an automatic login.
 */
 macreg.autoLogin = function () {
-  document.removeEventListener("DOMContentLoaded", macreg.autoLogin);
-  document.getElementById('btnLogin').addEventListener('click', function(event) {
-      event.preventDefault();
-  });
-  var sessionToken = localStorage.getItem(macreg.sessionTokenKey);
+    document.removeEventListener("DOMContentLoaded", macreg.autoLogin);
+    document.getElementById('btnLogin').addEventListener('click', function(event) {
+        event.preventDefault();
+    });
 
-  if (sessionToken == null) {
-    console.log('No session stored.');
-    return;
-  }
-
-  var header = ['Content-Type', 'application/json'];
-  var payload = {session: sessionToken};
-  var data = JSON.stringify(payload);
-  return macreg.makeRequest('PUT', macreg.LOGIN_URL, data, header).then(
-    function (response) {
-      console.log('Successfully refreshed session.');
-      var session = response.response;
-      localStorage.setItem(macreg.sessionTokenKey, session.token);
-      console.log('Redirectoing to submit page.');
-      window.location = 'submit.html';
-    },
-    function (error) {
-      console.log('Autologin failed:\n' + JSON.stringify(error));
-    }
-  );
+    const header = ['Content-Type', 'application/json'];
+    const payload = {session: sessionToken};
+    const data = JSON.stringify(payload);
+    return macreg.makeRequest('PUT', macreg.LOGIN_URL, data, header).then(
+        function (response) {
+            console.log('Successfully refreshed session.');
+            console.log('Redirectoing to submit page.');
+            window.location = 'submit.html';
+        },
+        function (error) {
+            console.log('Autologin failed:\n' + JSON.stringify(error));
+        }
+    );
 };
 
 
@@ -186,24 +169,22 @@ macreg.autoLogin = function () {
   Performs a login.
 */
 macreg.login = function () {
-  var userName = document.getElementById('userName').value;
-  var password = document.getElementById('password').value;
-  var header = ['Content-Type', 'application/json'];
-  var payload = {'userName': userName, 'passwd': password};
-  var data = JSON.stringify(payload);
-  return macreg.makeRequest('POST', macreg.LOGIN_URL, data, header).then(
-    function (response) {
-      console.log('Successfully logged in.');
-      var session = response.response;
-      localStorage.setItem(macreg.sessionTokenKey, session.token);
-      console.log('Redirecting to submit page.');
-      window.location = 'submit.html';
-    },
-    function (error) {
-      console.log('Login failed:\n' + JSON.stringify(error));
-      alert(error.response);
-    }
-  );
+    const userName = document.getElementById('userName').value;
+    const password = document.getElementById('password').value;
+    const header = ['Content-Type', 'application/json'];
+    const payload = {'userName': userName, 'passwd': password};
+    const data = JSON.stringify(payload);
+    return macreg.makeRequest('POST', macreg.LOGIN_URL, data, header).then(
+        function (response) {
+            console.log('Successfully logged in.');
+            console.log('Redirecting to submit page.');
+            window.location = 'submit.html';
+        },
+        function (error) {
+            console.log('Login failed:\n' + JSON.stringify(error));
+            alert(error.response);
+        }
+    );
 };
 
 
@@ -211,26 +192,26 @@ macreg.login = function () {
   Submits a new MAC address.
 */
 macreg.submit = function () {
-  var macAddress = document.getElementById('macAddress').value;
-  var description = document.getElementById('description').value
-  var payload = {'macAddress': macAddress, 'description': description};
-  var header = ['Content-Type', 'application/json'];
-  var data = JSON.stringify(payload);
-  return macreg.makeRequest('POST', macreg.SUBMIT_URL + macreg.getQueryArgs(), data, header).then(
-    function(response) {
-      var form = document.getElementById('submitForm');
-      form.reset();
-      macreg.render();
-    },
-    function (error) {
-      if (error.status == 410) {
-        // Session expired.
-        window.location = 'index.html';
-        alert(error.response);
-      } else {
-        onsole.log('Could not submit MAC address:\n' + JSON.stringify(error));
-        alert(error.response);
-      }
-    }
-  );
+    const macAddress = document.getElementById('macAddress').value;
+    const description = document.getElementById('description').value
+    const payload = {'macAddress': macAddress, 'description': description};
+    const header = ['Content-Type', 'application/json'];
+    const data = JSON.stringify(payload);
+    return macreg.makeRequest('POST', macreg.SUBMIT_URL, data, header).then(
+        function(response) {
+            const form = document.getElementById('submitForm');
+            form.reset();
+            macreg.render();
+        },
+        function (error) {
+            if (error.status == 410) {
+                // Session expired.
+                window.location = 'index.html';
+                alert(error.response);
+            } else {
+                onsole.log('Could not submit MAC address:\n' + JSON.stringify(error));
+                alert(error.response);
+            }
+        }
+    );
 };

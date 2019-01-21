@@ -1,10 +1,10 @@
 """Service configuration parser."""
 
-from json import loads
+from configparser import ConfigParser
 
 
 __all__ = ['CONFIG']
 
 
-with open('/etc/macreg.json', 'r') as file:
-    CONFIG = loads(file.read())
+CONFIG = ConfigParser()
+CONFIG.read('/etc/macreg.conf')
