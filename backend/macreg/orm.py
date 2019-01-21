@@ -187,9 +187,5 @@ class MACList(_MacRegModel):
             comment=self.comment, name=self.name,
             mac_address=self.mac_address, ipv4address=self.ipv4address)
 
-    def email(self):
-        """Sends this record via email."""
-
-
 
 MODELS = (Session, MACList)

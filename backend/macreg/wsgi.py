@@ -8,7 +8,8 @@ from uuid import UUID
 from flask import Flask, request, jsonify
 from httpam import AuthenticationError, SessionExpired, SessionManager
 
-from macreg.config import CONFIG
+from macreg.config import admins
+from macreg.email import email
 from macreg.exceptions import AlreadyRegistered
 from macreg.exceptions import InvalidMacAddress
 from macreg.exceptions import InvalidSessionToken
@@ -158,7 +159,7 @@ def list_macs():
 
     user = _get_user()
 
-    if user in CONFIG.get('admins', ()):
+    if user in admins():
         records = MACList
     else:
         records = MACList.select().where(MACList.user_name == user)
@@ -173,7 +174,7 @@ def submit_mac():
     user = _get_user()
     record = MACList.from_json(request.json, user)
     record.save()
-    record.email()
+    email(record)
     return 'MAC address added.'
 
 
@@ -183,10 +184,10 @@ def enable_mac():
 
     user = _get_user()
 
-    if user not in CONFIG.get('admins', ()):
-        return ("You're not an admininistrator. Sorry.", 403)
+    if user in admins():
+        mac_address = request.json['macAddress']
+        record = MACList.get(MACList.mac_address == mac_address)
+        ipv4address = record.enable()
+        return f'IPv4 address assigned to MAC address: {ipv4address}.'
 
-    mac_address = request.json['macAddress']
-    record = MACList.get(MACList.mac_address == mac_address)
-    ipv4address = record.enable()
-    return f'IPv4 address assigned to MAC address: {ipv4address}.'
+    return ("You're not an admininistrator. Sorry.", 403)
