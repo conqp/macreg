@@ -108,7 +108,14 @@ def _internal_server_error(exception):
 def _set_cookie(response):
     """Sets session cookie on the response."""
 
-    response.set_cookie('session', _get_session().token.hex)
+    try:
+        session = _get_session()
+    except SessionExpired:
+        return response
+
+    if session.valid:
+        response.set_cookie('session', session.token.hex)
+
     return response
 
 
