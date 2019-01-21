@@ -60,6 +60,7 @@ macreg.makeRequest = function (method, url, data=null, ...headers) {
         };
 
         const xhr = new XMLHttpRequest();
+        xhr.withCredentials = true;
         xhr.open(method, url);
 
         for (let header of headers) {
