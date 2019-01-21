@@ -81,6 +81,25 @@ macreg.makeRequest = function (method, url, data=null, ...headers) {
 
 
 /*
+    Creates an enable button for the respective record.
+*/
+macreg._buttons = function (record) {
+    const column = document.createElement('td');
+    const buttonEnable = document.createElement('button');
+    buttonEnable.setAttribute('class', 'btn btn-success macreg-enable');
+    buttonEnable.setAttribute('data-id', record.id);
+    buttonEnable.textContent = '✓';
+    column.appendChild(buttonEnable);
+    const buttonDelete = document.createElement('button');
+    buttonDelete.setAttribute('class', 'btn btn-error macreg-delete');
+    buttonDelete.setAttribute('data-id', record.id);
+    buttonDelete.textContent = '✗';
+    column.appendChild(buttonDelete);
+    return column;
+};
+
+
+/*
   Renders the respective records.
 */
 macreg._render = function (response) {
@@ -104,6 +123,7 @@ macreg._render = function (response) {
             row.appendChild(column)
         }
 
+        row.appendChild(macreg._buttons(record));
         container.appendChild(row);
     }
 };
@@ -117,6 +137,19 @@ macreg.submitInit = function () {
     document.getElementById('btnSubmit').addEventListener('click', function(event) {
         event.preventDefault();
     });
+
+    for (let button of document.getElementsByClassName('macreg-enable')) {
+        button.addEventListener('click', function() {
+            macreg._enable(button.getAttribute('data-id'));
+        });
+    }
+
+    for (let button of document.getElementsByClassName('macreg-delete')) {
+        button.addEventListener('click', function() {
+            macreg._delete(button.getAttribute('data-id'));
+        });
+    }
+
     return macreg.render();
 };
 
