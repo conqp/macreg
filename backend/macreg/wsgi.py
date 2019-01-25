@@ -48,6 +48,18 @@ def _get_user():
     return _get_session().user
 
 
+def _get_mac_address(ident):
+    """Returns the respective MAC address record."""
+
+    user = _get_user()
+    condition = MACList.id == ident
+
+    if user not in admins():
+        condition &= MACList.user_name == user
+
+    return MACList.get(condition)
+
+
 @APPLICATION.errorhandler(SessionExpired)
 def _session_expired(_):
     """Returns an appropriate error message."""
@@ -88,6 +100,13 @@ def _already_registered(_):
     """Returns an appropriate error message."""
 
     return ('This MAC address has already been registered.', 400)
+
+
+@APPLICATION.errorhandler(MACList.DoesNotExist)
+def _no_such_mac(_):
+    """Returns an appropriate error message."""
+
+    return ('The requested MAC address does not exist.', 404)
 
 
 @APPLICATION.errorhandler(Exception)
@@ -175,11 +194,11 @@ def submit_mac():
     record = MACList.from_json(request.json, user)
     record.save()
     email(record)
-    return 'MAC address added.'
+    return ('MAC address added.', 201)
 
 
 @APPLICATION.route('/mac', methods=['PATCH'])
-def enable_mac():
+def toggle_mac():
     """Submit a MAC address."""
 
     user = _get_user()
@@ -187,7 +206,21 @@ def enable_mac():
     if user in admins():
         mac_address = request.json['macAddress']
         record = MACList.get(MACList.mac_address == mac_address)
+
+        if record.enabled:
+            record.disable()
+            return 'Record disabled.'
+
         ipv4address = record.enable()
         return f'IPv4 address assigned to MAC address: {ipv4address}.'
 
     return ("You're not an admininistrator. Sorry.", 403)
+
+
+@APPLICATION.route('/mac/<int:ident>', methods=['DELETE'])
+def delete_mac(ident):
+    """Deletes a MAC address."""
+
+    mac_address = _get_mac_address(ident)
+    mac_address.delete_instance()
+    return 'MAC address deleted.'

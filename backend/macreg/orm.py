@@ -8,6 +8,7 @@ from re import compile  # pylint: disable=W0622
 from uuid import uuid4
 
 from httpam import NoSuchSession
+from peewee import BooleanField
 from peewee import CharField
 from peewee import DateTimeField
 from peewee import FixedCharField
@@ -43,7 +44,7 @@ def create_tables(safe=True):
         model.create_table(safe=safe)
 
 
-class _MacRegModel(JSONModel):
+class _MacRegModel(JSONModel):  # pylint: disable=R0903
     """Base model."""
 
     class Meta:     # pylint: disable=C0111,R0903
@@ -111,6 +112,7 @@ class MACList(_MacRegModel):
     mac_address = FixedCharField(17, unique=True)
     ipv4address = IPv4AddressField(null=True)
     timestamp = DateTimeField(default=datetime.now)
+    enabled = BooleanField(default=False)
 
     @classmethod
     def from_json(cls, json, user_name, skip=IGNORE_FIELDS, **kwargs):
@@ -119,6 +121,8 @@ class MACList(_MacRegModel):
 
         if MAC_PATTERN.fullmatch(mac_address) is None:
             raise InvalidMacAddress()
+
+        mac_address = mac_address.replace('-', ':').upper()     # Normalize.
 
         try:
             record = cls.get(cls.mac_address == mac_address)
@@ -148,7 +152,7 @@ class MACList(_MacRegModel):
         raise NetworkExhausted()
 
     @classmethod
-    def enabled(cls):
+    def list_enabled(cls):
         """Yields enabled records."""
         return cls.select().where(~ cls.ipv4address >> None)
 
@@ -157,7 +161,7 @@ class MACList(_MacRegModel):
         """Returns an appropriate dhcpd.conf."""
         prefix = () if prefix is None else (prefix,)
         suffix = () if suffix is None else (suffix,)
-        records = (record.to_dhcpd() for record in cls.enabled())
+        records = (record.to_dhcpd() for record in cls.list_enabled())
         return spacing.join(chain(prefix, records, suffix))
 
     @property
@@ -174,9 +178,15 @@ class MACList(_MacRegModel):
         """Enables the record."""
         if self.ipv4address is None:
             self.ipv4address = type(self).free_ipv4address()
-            self.save()
 
+        self.enabled = True
+        self.save()
         return self.ipv4address
+
+    def disable(self):
+        """Disables the MAC address."""
+        self.enabled = False
+        self.save()
 
     def to_dhcpd(self):
         """Returns a string for a dhcpd.conf file entry."""
