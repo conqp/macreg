@@ -201,9 +201,7 @@ macreg.autoLogin = function () {
     });
 
     const header = ['Content-Type', 'application/json'];
-    const payload = {session: sessionToken};
-    const data = JSON.stringify(payload);
-    return macreg.makeRequest('PUT', macreg.LOGIN_URL, data, header).then(
+    return macreg.makeRequest('PUT', macreg.LOGIN_URL, null, header).then(
         function (response) {
             console.log('Successfully refreshed session.');
             console.log('Redirectoing to submit page.');
