@@ -133,9 +133,7 @@ def _set_cookie(response):
     except SessionExpired:
         return response
 
-    if session.valid:
-        response.set_cookie('session', session.token.hex)
-
+    response.set_cookie('session', session.token.hex)
     return response
 
 

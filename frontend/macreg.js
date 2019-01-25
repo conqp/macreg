@@ -86,14 +86,24 @@ macreg.makeRequest = function (method, url, data=null, ...headers) {
 */
 macreg._buttons = function (record) {
     const column = document.createElement('td');
-    const buttonEnable = document.createElement('button');
-    buttonEnable.setAttribute('class', 'btn btn-success macreg-enable');
-    buttonEnable.setAttribute('data-id', record.id);
-    buttonEnable.textContent = '✓';
-    column.appendChild(buttonEnable);
+    const buttonToggle = document.createElement('button');
+    buttonToggle.setAttribute('data-id', record.id);
+
+    if (record.enabled) {
+      buttonToggle.setAttribute('class', 'btn btn-warning macreg-toggle');
+      buttonToggle.textContent = 'Disable';
+    } else {
+      buttonToggle.setAttribute('class', 'btn btn-success macreg-toggle');
+      buttonToggle.textContent = 'Enable';
+    }
+
+    column.appendChild(buttonToggle);
     const buttonDelete = document.createElement('button');
     buttonDelete.setAttribute('class', 'btn btn-error macreg-delete');
     buttonDelete.setAttribute('data-id', record.id);
+    buttonDelete.setAttribute('data-toggle', 'tooltip');
+    buttonDelete.setAttribute('data-placement', 'top');
+    buttonDelete.setAttribute('title', 'Delete this MAC address.');
     buttonDelete.textContent = '✗';
     column.appendChild(buttonDelete);
     return column;
@@ -131,6 +141,13 @@ macreg._render = function (response) {
 
 
 /*
+  Toggles a MAC address between enabled / disabled.
+*/
+macreg._toggle = function (id) {
+};
+
+
+/*
   Runs on submit.html.
 */
 macreg.submitInit = function () {
@@ -139,9 +156,9 @@ macreg.submitInit = function () {
         event.preventDefault();
     });
 
-    for (let button of document.getElementsByClassName('macreg-enable')) {
+    for (let button of document.getElementsByClassName('macreg-toggle')) {
         button.addEventListener('click', function() {
-            macreg._enable(button.getAttribute('data-id'));
+            macreg._toggle(button.getAttribute('data-id'));
         });
     }
 
@@ -216,7 +233,7 @@ macreg.login = function () {
         },
         function (error) {
             console.log('Login failed:\n' + JSON.stringify(error));
-            alert(error.response);
+            alert(error.response || 'Anmeldung fehlgeschlagen.');
         }
     );
 };
@@ -244,7 +261,7 @@ macreg.submit = function () {
                 alert(error.response);
             } else {
                 onsole.log('Could not submit MAC address:\n' + JSON.stringify(error));
-                alert(error.response);
+                alert(error.response || 'Could not submit MAC address.');
             }
         }
     );
