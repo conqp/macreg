@@ -109,21 +109,6 @@ def _no_such_mac(_):
     return ('The requested MAC address does not exist.', 404)
 
 
-@APPLICATION.errorhandler(Exception)
-def _internal_server_error(exception):
-    """Returns an appropriate error message."""
-
-    with NamedTemporaryFile(
-            mode='w', prefix='macreg_', suffix='.stacktrace',
-            delete=False) as tmp:
-        tmp.write(format_exc())
-        tmp.write('\n')
-        tmp.write(str(exception))
-
-    LOGGER.error('Stacktrace written to "%s".', tmp.name)
-    return ('Internal server error.', 500)
-
-
 @APPLICATION.after_request
 def _set_cookie(response):
     """Sets session cookie on the response."""
