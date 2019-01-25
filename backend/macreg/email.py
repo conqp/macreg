@@ -13,8 +13,6 @@ __all__ = ['email']
 
 
 LOGGER = getLogger(__file__)
-SUBJECT = CONFIG['email']['subject']
-MAILER = SMTP(CONFIG['smtp']['server'], int(CONFIG['smtp']['port']))
 
 
 def _emails(record):
@@ -37,7 +35,7 @@ def _emails(record):
 def email(record):
     """Emails a MAC list record."""
 
-    with MAILER as smtp:
+    with SMTP(CONFIG['smtp']['server'], int(CONFIG['smtp']['port'])) as smtp:
         smtp.starttls()
         smtp.ehlo()
         smtp.login(CONFIG['smtp']['user'], CONFIG['smtp']['passwd'])
