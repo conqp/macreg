@@ -222,3 +222,7 @@ def delete_mac(ident):
     mac_address = _get_mac_address(ident)
     mac_address.delete_instance()
     return 'MAC address deleted.'
+
+
+if __name__ == '__main__':
+    APPLICATION.run()
