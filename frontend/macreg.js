@@ -144,7 +144,37 @@ macreg._render = function (response) {
   Toggles a MAC address between enabled / disabled.
 */
 macreg._toggle = function (id) {
+    return macreg.makeRequest('PATCH', macreg.SUBMIT_URL + '/' + id).then(
+        macreg._render,
+        function (error) {
+            console.log('Could not toggle MAC address:\n' + JSON.stringify(error));
+            alert(error.response);
+
+            if (error.status == 401) {
+                window.location = 'index.html';
+            }
+        }
+    );
 };
+
+
+/*
+    Deletes a MAC address.
+*/
+macreg._delete = function (id) {
+    return macreg.makeRequest('DELETE', macreg.SUBMIT_URL + '/' + id).then(
+        macreg._render,
+        function (error) {
+            console.log('Could not toggle MAC address:\n' + JSON.stringify(error));
+            alert(error.response);
+
+            if (error.status == 401) {
+                window.location = 'index.html';
+            }
+        }
+    );
+};
+
 
 
 /*

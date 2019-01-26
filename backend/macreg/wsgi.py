@@ -183,24 +183,21 @@ def submit_mac():
     return ('MAC address added.', 201)
 
 
-@APPLICATION.route('/mac', methods=['PATCH'])
-def toggle_mac():
+@APPLICATION.route('/mac/<int:ident>', methods=['PATCH'])
+def toggle_mac(ident):
     """Submit a MAC address."""
 
-    user = _get_user()
+    if _get_user() not in admins():
+        return ("You're not an admininistrator. Sorry.", 403)
 
-    if user in admins():
-        mac_address = request.json['macAddress']
-        record = MACList.get(MACList.mac_address == mac_address)
+    mac_address = _get_mac_address(ident)
 
-        if record.enabled:
-            record.disable()
-            return 'Record disabled.'
+    if mac_address.enabled:
+        mac_address.disable()
+        return 'Record disabled.'
 
-        ipv4address = record.enable()
-        return f'IPv4 address assigned to MAC address: {ipv4address}.'
-
-    return ("You're not an admininistrator. Sorry.", 403)
+    ipv4address = mac_address.enable()
+    return f'IPv4 address assigned to MAC address: {ipv4address}.'
 
 
 @APPLICATION.route('/mac/<int:ident>', methods=['DELETE'])
