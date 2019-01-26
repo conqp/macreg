@@ -6,7 +6,7 @@ from uuid import UUID
 from flask import Flask, request, jsonify
 from httpam import AuthenticationError, SessionExpired, SessionManager
 
-from macreg.config import admins
+from macreg.config import CONFIG, admins
 from macreg.email import email
 from macreg.exceptions import AlreadyRegistered
 from macreg.exceptions import InvalidMacAddress
@@ -28,8 +28,10 @@ SESSION_MANAGER = SessionManager(Session, config='/etc/macreg.json')
 def _get_session():
     """Returns the current session."""
 
+    cookie = CONFIG['app']['cookie']
+
     try:
-        token = request.cookies['session']
+        token = request.cookies[cookie]
     except KeyError:
         raise NotLoggedIn()
 

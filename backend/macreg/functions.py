@@ -28,6 +28,6 @@ def set_session_cookie(response, session):
     """Sets the session cookie."""
 
     response.set_cookie(
-        'session', session.token.hex, expires=session.end,
+        CONFIG['app']['cookie'], session.token.hex, expires=session.end,
         domain=CONFIG['app']['domain'], secure=True)
     return response
