@@ -1,8 +1,6 @@
 """WSGI service."""
 
 from logging import getLogger
-from tempfile import NamedTemporaryFile
-from traceback import format_exc
 from uuid import UUID
 
 from flask import Flask, request, jsonify
@@ -115,7 +113,7 @@ def _set_cookie(response):
 
     try:
         session = _get_session()
-    except SessionExpired:
+    except (NotLoggedIn, SessionExpired):
         return response
 
     response.set_cookie('session', session.token.hex)
@@ -133,11 +131,11 @@ def login():
         return ('No user name and / or password provided.', 400)
 
     try:
-        session = SESSION_MANAGER.login(user_name, passwd)
+        SESSION_MANAGER.login(user_name, passwd)
     except AuthenticationError:
         return ('Invalid user name or password.', 400)
 
-    return jsonify(session.to_json())
+    return 'Logged in.'
 
 
 @APPLICATION.route('/login', methods=['PUT'])
