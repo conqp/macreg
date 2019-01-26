@@ -116,7 +116,7 @@ class MACList(_MacRegModel):
 
     def __str__(self):
         """Returns the ID and MAC address."""
-        return '\t'.join(self.columns)
+        return '    '.join(self.columns)
 
     @classmethod
     def from_json(cls, json, user_name, skip=IGNORE_FIELDS, **kwargs):
