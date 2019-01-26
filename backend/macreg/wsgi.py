@@ -13,6 +13,7 @@ from macreg.exceptions import InvalidMacAddress
 from macreg.exceptions import InvalidSessionToken
 from macreg.exceptions import NetworkExhausted
 from macreg.exceptions import NotLoggedIn
+from macreg.functions import set_session_cookie
 from macreg.orm import Session, MACList
 
 
@@ -116,7 +117,7 @@ def _set_cookie(response):
     except (NotLoggedIn, SessionExpired):
         return response
 
-    response.set_cookie('session', session.token.hex)
+    set_session_cookie(response, session)
     return response
 
 
@@ -131,11 +132,13 @@ def login():
         return ('No user name and / or password provided.', 400)
 
     try:
-        SESSION_MANAGER.login(user_name, passwd)
+        session = SESSION_MANAGER.login(user_name, passwd)
     except AuthenticationError:
         return ('Invalid user name or password.', 400)
 
-    return 'Logged in.'
+    response = jsonify(session.to_json())
+    set_session_cookie(response, session)
+    return response
 
 
 @APPLICATION.route('/login', methods=['PUT'])

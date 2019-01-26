@@ -3,7 +3,7 @@
 from os import linesep
 
 
-__all__ = ['comment']
+__all__ = ['comment', 'set_session_cookie']
 
 
 def _comment_lines(string):
@@ -20,3 +20,12 @@ def comment(string):
     """Converts a string to dhcpd.conf comment lines."""
 
     return '\n'.join(_comment_lines(string))
+
+
+def set_session_cookie(response, session, domain=None):
+    """Sets the session cookie."""
+
+    response.set_cookie(
+        'session', session.token.hex, expires=session.end, domain=domain,
+        secure=True)
+    return response
