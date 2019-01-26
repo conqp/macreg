@@ -116,7 +116,7 @@ class MACList(_MacRegModel):
 
     def __str__(self):
         """Returns the ID and MAC address."""
-        return '\t'.join(str(column) for column in self.columns)
+        return '\t'.join(self.columns)
 
     @classmethod
     def from_json(cls, json, user_name, skip=IGNORE_FIELDS, **kwargs):
@@ -170,9 +170,11 @@ class MACList(_MacRegModel):
 
     @property
     def columns(self):
-        """Returns the record's columns."""
-        return (self.id, self.user_name, self.mac_address, self.ipv4address,
-                self.timestamp, self.enabled, self.description)
+        """Returns the record's columns as strings."""
+        return (str(self.id), self.user_name, self.mac_address,
+                str(self.ipv4address),
+                self.timestamp.isoformat(),     # pylint: disable=E1101
+                str(self.enabled), self.description)
 
     @property
     def name(self):
