@@ -255,7 +255,15 @@ macreg.submit = function () {
         function (error) {
             console.log('Could not submit MAC address:\n' + JSON.stringify(error));
             alert(error.response);
-            window.location = 'index.html';
+
+            switch(error.status) {
+            case 401:
+                window.location = 'index.html';
+                break;
+            default:
+                macreg.render();
+                break;
+            }
         }
     );
 };
