@@ -157,7 +157,7 @@ macreg._render = function (response) {
 */
 macreg._toggle = function (id) {
     return macreg.makeRequest('PATCH', macreg.SUBMIT_URL + '/' + id).then(
-        macreg._render,
+        macreg.render,
         function (error) {
             console.log('Could not toggle MAC address:\n' + JSON.stringify(error));
             alert(error.response);
@@ -175,7 +175,7 @@ macreg._toggle = function (id) {
 */
 macreg._delete = function (id) {
     return macreg.makeRequest('DELETE', macreg.SUBMIT_URL + '/' + id).then(
-        macreg._render,
+        macreg.render,
         function (error) {
             console.log('Could not toggle MAC address:\n' + JSON.stringify(error));
             alert(error.response);
