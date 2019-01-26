@@ -184,7 +184,8 @@ class MACList(_MacRegModel):
     @property
     def comment(self):
         """Returns a comment for this record."""
-        return f'# {self.timestamp}\n' + comment(self.description)
+        timestamp = self.timestamp.isoformat()  # pylint: disable=E1101
+        return f'# {timestamp}\n' + comment(self.description)
 
     def enable(self):
         """Enables the record."""
@@ -203,7 +204,7 @@ class MACList(_MacRegModel):
 
     def to_dhcpd(self):
         """Returns a string for a dhcpd.conf file entry."""
-        if self.ipv4address is None:
+        if not self.enabled or self.ipv4address is None:
             raise NotActivated()
 
         return DHCPD_TEMPLATE.format(
