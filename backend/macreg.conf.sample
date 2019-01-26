@@ -18,3 +18,8 @@ subject = New MAC address registered
 [smtp]
 server = smtp.youremailprovider.com
 port = 465
+user = yousmtpuser
+passwd = yoursmtppasswd
+
+[app]
+domain = yourdomain

@@ -2,6 +2,8 @@
 
 from os import linesep
 
+from macreg.config import CONFIG
+
 
 __all__ = ['comment', 'set_session_cookie']
 
@@ -22,10 +24,10 @@ def comment(string):
     return '\n'.join(_comment_lines(string))
 
 
-def set_session_cookie(response, session, domain=None):
+def set_session_cookie(response, session):
     """Sets the session cookie."""
 
     response.set_cookie(
-        'session', session.token.hex, expires=session.end, domain=domain,
-        secure=True)
+        'session', session.token.hex, expires=session.end,
+        domain=CONFIG['app']['domain'], secure=True)
     return response
