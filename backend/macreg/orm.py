@@ -108,15 +108,15 @@ class MACList(_MacRegModel):
         table_name = 'mac_list'
 
     user_name = CharField(255, unique=True)
-    description = CharField(255)
     mac_address = FixedCharField(17, unique=True)
     ipv4address = IPv4AddressField(null=True)
     timestamp = DateTimeField(default=datetime.now)
     enabled = BooleanField(default=False)
+    description = CharField(255)
 
     def __str__(self):
         """Returns the ID and MAC address."""
-        return f'{self.id}: {self.mac_address}'
+        return '\t'.join(str(column) for column in self.columns)
 
     @classmethod
     def from_json(cls, json, user_name, skip=IGNORE_FIELDS, **kwargs):
@@ -167,6 +167,12 @@ class MACList(_MacRegModel):
         suffix = () if suffix is None else (suffix,)
         records = (record.to_dhcpd() for record in cls.list_enabled())
         return spacing.join(chain(prefix, records, suffix))
+
+    @property
+    def columns(self):
+        """Returns the record's columns."""
+        return (self.id, self.user_name, self.mac_address, self.ipv4address,
+                self.timestamp, self.enabled, self.description)
 
     @property
     def name(self):
