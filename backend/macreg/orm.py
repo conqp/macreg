@@ -171,10 +171,10 @@ class MACList(_MacRegModel):
     @property
     def columns(self):
         """Returns the record's columns as strings."""
-        return (str(self.id), self.user_name, self.mac_address,
-                str(self.ipv4address),
+        return (str(self.id).rjust(4), str(self.user_name).rjust(16),
+                self.mac_address, str(self.ipv4address).rjust(15),
                 self.timestamp.isoformat(),     # pylint: disable=E1101
-                str(self.enabled), self.description)
+                str(self.enabled).rjust(5), self.description)
 
     @property
     def name(self):
