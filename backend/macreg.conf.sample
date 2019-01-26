@@ -22,5 +22,5 @@ user = yousmtpuser
 passwd = yoursmtppasswd
 
 [app]
-domain = yourdomain
+secure = false
 cookie = session

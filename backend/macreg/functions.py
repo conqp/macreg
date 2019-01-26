@@ -29,5 +29,5 @@ def set_session_cookie(response, session):
 
     response.set_cookie(
         CONFIG['app']['cookie'], session.token.hex, expires=session.end,
-        domain=CONFIG['app']['domain'], secure=True)
+        secure=CONFIG.getboolean('app', 'secure'))
     return response
