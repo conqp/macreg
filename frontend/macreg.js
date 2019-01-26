@@ -253,14 +253,9 @@ macreg.submit = function () {
             macreg.render();
         },
         function (error) {
-            if (error.status == 410) {
-                // Session expired.
-                window.location = 'index.html';
-                alert(error.response);
-            } else {
-                onsole.log('Could not submit MAC address:\n' + JSON.stringify(error));
-                alert(error.response || 'Could not submit MAC address.');
-            }
+            console.log('Could not submit MAC address:\n' + JSON.stringify(error));
+            window.location = 'index.html';
+            alert(error.response);
         }
     );
 };

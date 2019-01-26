@@ -72,14 +72,14 @@ def _session_expired(_):
 def _invalid_session_token(_):
     """Returns an appropriate error message."""
 
-    return ('Invalid session token.', 400)
+    return ('Invalid session token.', 401)
 
 
 @APPLICATION.errorhandler(NotLoggedIn)
 def _not_logged_in(_):
     """Returns an appropriate error message."""
 
-    return ('Not logged in.', 400)
+    return ('Not logged in.', 401)
 
 
 @APPLICATION.errorhandler(InvalidMacAddress)
@@ -93,14 +93,14 @@ def _invalid_mac_address(_):
 def _network_exhausted(_):
     """Returns an appropriate error message."""
 
-    return ('No free IP addresses left.', 400)
+    return ('No free IP addresses left.', 507)
 
 
 @APPLICATION.errorhandler(AlreadyRegistered)
 def _already_registered(_):
     """Returns an appropriate error message."""
 
-    return ('This MAC address has already been registered.', 400)
+    return ('This MAC address has already been registered.', 409)
 
 
 @APPLICATION.errorhandler(MACList.DoesNotExist)
