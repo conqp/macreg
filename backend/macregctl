@@ -8,7 +8,6 @@ Usage:
     macregctl dhcpdcfg [--prefix=<prefix>] [--suffix=<suffix>]
     macregctl enable <mac_address_or_id>...
     macregctl disable <mac_address_or_id>...
-    macregctl delete <mac_address_or_id>...
 
 Options:
     --enabled, -e           Only list enabled MAC addresses.
@@ -31,7 +30,7 @@ def _get_records(options):
 
     for mac_or_id in options['<mac_address_or_id>']:
         try:
-            ident = int(id)
+            ident = int(mac_or_id)
         except ValueError:
             condition = MACList.mac_address == mac_or_id
         else:
