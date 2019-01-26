@@ -1,0 +1,130 @@
+#! /usr/bin/env python3
+"""macregctl.
+
+The MAC registration CLI tool.
+
+Usage:
+    macregctl (list|ls) [--enabled] [--disabled]
+    macregctl dhcpdcfg [--prefix=<prefix>] [--suffix=<suffix>]
+    macregctl enable <mac_address_or_id>...
+    macregctl disable <mac_address_or_id>...
+    macregctl delete <mac_address_or_id>...
+
+Options:
+    --enabled, -e           Only list enabled records.
+    --disabled, -d          Only list disabled records.
+    --prefix=<prefix>, -p   Prefix for the dhcpd.conf genertor.
+    --suffix=<suffix>, -s   Suffix for the dhcpd.conf generator.
+    --help, -h              Show this page.
+"""
+from functools import wraps
+from os import geteuid
+from sys import exit, stderr    # pylint: disable=W0622
+
+from docopt import docopt
+
+from macreg.orm import MACList
+
+
+def _get_records(options):
+    """Yields the respective records."""
+
+    for mac_or_id in options['<mac_address_or_id>']:
+        try:
+            ident = int(id)
+        except ValueError:
+            condition = MACList.mac_address == mac_or_id
+        else:
+            condition = MACList.id == ident
+
+        try:
+            yield MACList.get(condition)
+        except MACList.DoesNotExist:
+            print(f'No such record: {mac_or_id}.', file=stderr, flush=True)
+
+
+def as_root(function):
+    """Runs function as root only."""
+
+    @wraps(function)
+    def wrapper(*args, **kwargs):
+        """Wraps the original function."""
+        if geteuid() != 0:
+            print('You must be root to run this function.')
+            exit(3)
+
+        return function(*args, **kwargs)
+
+    return wrapper
+
+
+def list_(options):
+    """Lists MAC addresses."""
+
+    enabled = options['--enabled']
+    disabled = options['--disabled']
+
+    if enabled and not disabled:
+        condition = MACList.enabled == 1
+    elif disabled and not enabled:
+        condition = MACList.enabled == 0
+    else:
+        condition = True
+
+    for record in MACList.select().where(condition):
+        print(record)
+
+    print(end='', flush=True)
+
+
+@as_root
+def dhcpdconf(options):
+    """Generates the dhcpd.conf file."""
+
+    prefix = options['--prefix']
+    suffix = options['--suffix']
+    dhcpd_conf = MACList.dhcpd_conf(prefix=prefix, suffix=suffix)
+    print(dhcpd_conf, flush=True)
+
+
+@as_root
+def enable(options):
+    """Enables the respective MAC addresses."""
+
+    for record in _get_records(options):
+        suffix = 'unchanged.' if record.enabled else 'enabled.'
+        ip_address = record.enable()
+        print(record.mac_address, '→', ip_address, suffix)
+
+    print(end='', flush=True)
+
+
+@as_root
+def disable(options):
+    """Disables the respective MAC addresses."""
+
+    for record in _get_records(options):
+        suffix = 'disabled.' if record.enabled else 'unchanged.'
+        record.disable()
+        print(record.mac_address, suffix)
+
+    print(end='', flush=True)
+
+
+def main(options):
+    """Runs the script."""
+
+    if options['list'] or options['ls']:
+        list_(options)
+    elif options['dhcpdcfg']:
+        dhcpdconf(options)
+    elif options['enable']:
+        enable(options)
+    elif options['disable']:
+        disable(options)
+
+    exit(0)
+
+
+if __name__ == '__main__':
+    main(docopt(__doc__))

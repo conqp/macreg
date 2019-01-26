@@ -186,6 +186,7 @@ class MACList(_MacRegModel):
     def disable(self):
         """Disables the MAC address."""
         self.enabled = False
+        self.ipv4address = None     # Free IP address.
         self.save()
 
     def to_dhcpd(self):
