@@ -137,6 +137,18 @@ macreg._render = function (response) {
         row.appendChild(macreg._buttons(record));
         container.appendChild(row);
     }
+
+    for (let button of document.getElementsByClassName('macreg-toggle')) {
+        button.addEventListener('click', function() {
+            macreg._toggle(button.getAttribute('data-id'));
+        });
+    }
+
+    for (let button of document.getElementsByClassName('macreg-delete')) {
+        button.addEventListener('click', function() {
+            macreg._delete(button.getAttribute('data-id'));
+        });
+    }
 };
 
 
@@ -185,19 +197,6 @@ macreg.submitInit = function () {
     document.getElementById('btnSubmit').addEventListener('click', function(event) {
         event.preventDefault();
     });
-
-    for (let button of document.getElementsByClassName('macreg-toggle')) {
-        button.addEventListener('click', function() {
-            macreg._toggle(button.getAttribute('data-id'));
-        });
-    }
-
-    for (let button of document.getElementsByClassName('macreg-delete')) {
-        button.addEventListener('click', function() {
-            macreg._delete(button.getAttribute('data-id'));
-        });
-    }
-
     return macreg.render();
 };
 
