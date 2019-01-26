@@ -114,6 +114,10 @@ class MACList(_MacRegModel):
     timestamp = DateTimeField(default=datetime.now)
     enabled = BooleanField(default=False)
 
+    def __str__(self):
+        """Returns the ID and MAC address."""
+        return f'{self.id}: {self.mac_address}'
+
     @classmethod
     def from_json(cls, json, user_name, skip=IGNORE_FIELDS, **kwargs):
         """Creates a new record from a JSON-ish dict."""

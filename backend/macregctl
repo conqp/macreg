@@ -11,9 +11,9 @@ Usage:
     macregctl delete <mac_address_or_id>...
 
 Options:
-    --enabled, -e           Only list enabled records.
-    --disabled, -d          Only list disabled records.
-    --prefix=<prefix>, -p   Prefix for the dhcpd.conf genertor.
+    --enabled, -e           Only list enabled MAC addresses.
+    --disabled, -d          Only list disabled MAC addresses.
+    --prefix=<prefix>, -p   Prefix for the dhcpd.conf generator.
     --suffix=<suffix>, -s   Suffix for the dhcpd.conf generator.
     --help, -h              Show this page.
 """
