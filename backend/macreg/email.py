@@ -18,7 +18,9 @@ LOGGER = getLogger(__file__)
 def _emails(record):
     """Yields emails for the respective record."""
 
-    text = CONFIG['email']['body'].format(record)
+    text = CONFIG['email']['body'].format(
+        mac_address=record.mac_address, user_name=record.user_name,
+        description=record.description)
 
     for recipient in emails():
         message = MIMEMultipart(subtype='alternative')
