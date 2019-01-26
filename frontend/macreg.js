@@ -183,8 +183,8 @@ macreg.render = function () {
 
             if (error.status == 401) {
                 // Session expired.
-                window.location = 'index.html';
                 alert(error.response);
+                window.location = 'index.html';
             }
         }
     );
@@ -254,8 +254,8 @@ macreg.submit = function () {
         },
         function (error) {
             console.log('Could not submit MAC address:\n' + JSON.stringify(error));
-            window.location = 'index.html';
             alert(error.response);
+            window.location = 'index.html';
         }
     );
 };
