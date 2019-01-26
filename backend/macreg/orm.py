@@ -185,7 +185,8 @@ class MACList(_MacRegModel):
     def comment(self):
         """Returns a comment for this record."""
         timestamp = self.timestamp.isoformat()  # pylint: disable=E1101
-        return f'# {timestamp}\n' + comment(self.description)
+        description = f'{self.user_name}: {self.description}'
+        return f'# {timestamp}\n' + comment(description)
 
     def enable(self):
         """Enables the record."""
