@@ -14,6 +14,7 @@ emails = mail@admin1.com, mail@admin2.com
 [email]
 sender = automailer@yourdomain.com
 subject = New MAC address registered
+body = A new MAC address has been requested: {}.
 
 [smtp]
 server = smtp.youremailprovider.com
