@@ -82,9 +82,9 @@ macreg.makeRequest = function (method, url, data=null, ...headers) {
 
 
 /*
-    Creates an enable button for the respective record.
+    Creates a toggle button for the respective record.
 */
-macreg._buttons = function (record) {
+macreg._toggleButton = function (record) {
     const column = document.createElement('td');
     const buttonToggle = document.createElement('button');
     buttonToggle.setAttribute('data-id', record.id);
@@ -98,6 +98,15 @@ macreg._buttons = function (record) {
     }
 
     column.appendChild(buttonToggle);
+    return column;
+};
+
+
+/*
+    Creates a delete button for the respective record.
+*/
+macreg._deleteButton = function (record) {
+    const column = document.createElement('td');
     const buttonDelete = document.createElement('button');
     buttonDelete.setAttribute('class', 'btn btn-danger macreg-delete');
     buttonDelete.setAttribute('data-id', record.id);
@@ -134,7 +143,8 @@ macreg._render = function (response) {
             row.appendChild(column)
         }
 
-        row.appendChild(macreg._buttons(record));
+        row.appendChild(macreg._toggleButton(record));
+        row.appendChild(macreg._deleteButton(record));
         container.appendChild(row);
     }
 
