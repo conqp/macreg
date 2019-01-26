@@ -99,12 +99,12 @@ macreg._buttons = function (record) {
 
     column.appendChild(buttonToggle);
     const buttonDelete = document.createElement('button');
-    buttonDelete.setAttribute('class', 'btn btn-error macreg-delete');
+    buttonDelete.setAttribute('class', 'btn btn-danger macreg-delete');
     buttonDelete.setAttribute('data-id', record.id);
     buttonDelete.setAttribute('data-toggle', 'tooltip');
     buttonDelete.setAttribute('data-placement', 'top');
     buttonDelete.setAttribute('title', 'Delete this MAC address.');
-    buttonDelete.textContent = '✗';
+    buttonDelete.textContent = 'Delete';
     column.appendChild(buttonDelete);
     return column;
 };
