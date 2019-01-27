@@ -5,7 +5,7 @@ user = macreg
 passwd = yourdbpassword
 
 [network]
-network = 192.168.0.1/24
+network = 192.168.0.0/24
 
 [admins]
 admins = admin1, admin1
