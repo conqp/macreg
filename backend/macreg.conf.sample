@@ -19,7 +19,7 @@ body = User {user_name} has request to enable MAC address {mac_address} for {des
 [smtp]
 server = smtp.youremailprovider.com
 port = 465
-user = yousmtpuser
+user = yoursmtpuser
 passwd = yoursmtppasswd
 
 [app]
