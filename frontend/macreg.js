@@ -251,7 +251,7 @@ macreg.login = function () {
 macreg.submit = function () {
     const macAddress = document.getElementById('macAddress').value;
     const description = document.getElementById('description').value;
-    const payload = {'macAddress': macAddress, 'description': description};
+    const payload = {'macAddress': macAddress.trim(), 'description': description.trim()};
     const header = ['Content-Type', 'application/json'];
     const data = JSON.stringify(payload);
     return macreg.makeRequest('POST', macreg.SUBMIT_URL, data, header).then(
