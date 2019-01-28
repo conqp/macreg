@@ -32,7 +32,7 @@ macreg.makeRequest = function (method, url, data=null, ...headers) {
         } catch (error) {
             return response;
         }
-    };
+    }
 
     function executor (resolve, reject) {
         function onload () {
@@ -49,7 +49,7 @@ macreg.makeRequest = function (method, url, data=null, ...headers) {
                     statusText: xhr.statusText
                 });
             }
-        };
+        }
 
         function onerror () {
             reject({
@@ -57,7 +57,7 @@ macreg.makeRequest = function (method, url, data=null, ...headers) {
                 status: this.status,
                 statusText: xhr.statusText
             });
-        };
+        }
 
         const xhr = new XMLHttpRequest();
         xhr.withCredentials = true;
@@ -75,7 +75,7 @@ macreg.makeRequest = function (method, url, data=null, ...headers) {
         } else {
             xhr.send(data);
         }
-    };
+    }
 
     return new Promise(executor);
 };
@@ -89,12 +89,12 @@ macreg._toggleButton = function (record) {
     const buttonToggle = document.createElement('button');
     buttonToggle.setAttribute('data-id', record.id);
 
-    if (record.enabled) {
-      buttonToggle.setAttribute('class', 'btn btn-warning macreg-toggle');
-      buttonToggle.textContent = 'Disable';
+    if (record.ipv4address == null) {
+        buttonToggle.setAttribute('class', 'btn btn-success macreg-toggle');
+        buttonToggle.textContent = 'Enable';
     } else {
-      buttonToggle.setAttribute('class', 'btn btn-success macreg-toggle');
-      buttonToggle.textContent = 'Enable';
+        buttonToggle.setAttribute('class', 'btn btn-warning macreg-toggle');
+        buttonToggle.textContent = 'Disable';
     }
 
     column.appendChild(buttonToggle);

@@ -8,7 +8,6 @@ from re import compile  # pylint: disable=W0622
 from uuid import uuid4
 
 from httpam import NoSuchSession
-from peewee import BooleanField
 from peewee import CharField
 from peewee import DateTimeField
 from peewee import FixedCharField
@@ -111,7 +110,6 @@ class MACList(_MacRegModel):
     mac_address = FixedCharField(17, unique=True)
     ipv4address = IPv4AddressField(null=True)
     timestamp = DateTimeField(default=datetime.now)
-    enabled = BooleanField(default=False)
     description = CharField(255)
 
     def __str__(self):
@@ -169,12 +167,17 @@ class MACList(_MacRegModel):
         return spacing.join(chain(prefix, records, suffix))
 
     @property
+    def enables(self):
+        """Determines whether the MAC address is enbled."""
+        return self.ipv4address is not None
+
+    @property
     def columns(self):
         """Returns the record's columns as strings."""
         return (str(self.id).rjust(4), str(self.user_name).rjust(16),
                 self.mac_address, str(self.ipv4address).rjust(15),
                 self.timestamp.isoformat(),     # pylint: disable=E1101
-                str(self.enabled).rjust(5), self.description)
+                self.description)
 
     @property
     def name(self):
@@ -193,19 +196,17 @@ class MACList(_MacRegModel):
         if self.ipv4address is None:
             self.ipv4address = type(self).free_ipv4address()
 
-        self.enabled = True
         self.save()
         return self.ipv4address
 
     def disable(self):
         """Disables the MAC address."""
-        self.enabled = False
         self.ipv4address = None     # Free IP address.
         self.save()
 
     def to_dhcpd(self):
         """Returns a string for a dhcpd.conf file entry."""
-        if not self.enabled or self.ipv4address is None:
+        if not self.enabled:
             raise NotActivated()
 
         return DHCPD_TEMPLATE.format(
