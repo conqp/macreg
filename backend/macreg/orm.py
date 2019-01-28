@@ -167,7 +167,7 @@ class MACList(_MacRegModel):
         return spacing.join(chain(prefix, records, suffix))
 
     @property
-    def enables(self):
+    def enabled(self):
         """Determines whether the MAC address is enbled."""
         return self.ipv4address is not None
 
