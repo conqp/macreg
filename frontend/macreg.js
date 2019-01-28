@@ -123,7 +123,6 @@ macreg._deleteButton = function (record) {
   Renders the respective records.
 */
 macreg._render = function (response) {
-    console.log('Rendering records.');
     const container = document.getElementById('records');
     container.innerHTML = '';
 
@@ -140,7 +139,7 @@ macreg._render = function (response) {
         for (let field of fields) {
             let column = document.createElement('td');
             column.textContent = field;
-            row.appendChild(column)
+            row.appendChild(column);
         }
 
         row.appendChild(macreg._toggleButton(record));
@@ -169,7 +168,6 @@ macreg._toggle = function (id) {
     return macreg.makeRequest('PATCH', macreg.SUBMIT_URL + '/' + id).then(
         macreg.render,
         function (error) {
-            console.log('Could not toggle MAC address:\n' + JSON.stringify(error));
             alert(error.response);
 
             if (error.status == 401) {
@@ -187,7 +185,6 @@ macreg._delete = function (id) {
     return macreg.makeRequest('DELETE', macreg.SUBMIT_URL + '/' + id).then(
         macreg.render,
         function (error) {
-            console.log('Could not toggle MAC address:\n' + JSON.stringify(error));
             alert(error.response);
 
             if (error.status == 401) {
@@ -218,36 +215,11 @@ macreg.render = function () {
     return macreg.makeRequest('GET', macreg.SUBMIT_URL).then(
         macreg._render,
         function (error) {
-            console.log('Could not query MAC addresses:\n' + JSON.stringify(error));
-
             if (error.status == 401) {
                 // Session expired.
                 alert(error.response);
                 window.location = 'index.html';
             }
-        }
-    );
-};
-
-
-/*
-  Attempts an automatic login.
-*/
-macreg.autoLogin = function () {
-    document.removeEventListener("DOMContentLoaded", macreg.autoLogin);
-    document.getElementById('btnLogin').addEventListener('click', function(event) {
-        event.preventDefault();
-    });
-
-    const header = ['Content-Type', 'application/json'];
-    return macreg.makeRequest('PUT', macreg.LOGIN_URL, null, header).then(
-        function (response) {
-            console.log('Successfully refreshed session.');
-            console.log('Redirectoing to submit page.');
-            window.location = 'submit.html';
-        },
-        function (error) {
-            console.log('Autologin failed:\n' + JSON.stringify(error));
         }
     );
 };
@@ -263,13 +235,10 @@ macreg.login = function () {
     const payload = {'userName': userName, 'passwd': password};
     const data = JSON.stringify(payload);
     return macreg.makeRequest('POST', macreg.LOGIN_URL, data, header).then(
-        function (response) {
-            console.log('Successfully logged in.');
-            console.log('Redirecting to submit page.');
+        function () {
             window.location = 'submit.html';
         },
         function (error) {
-            console.log('Login failed:\n' + JSON.stringify(error));
             alert(error.response || 'Anmeldung fehlgeschlagen.');
         }
     );
@@ -281,18 +250,17 @@ macreg.login = function () {
 */
 macreg.submit = function () {
     const macAddress = document.getElementById('macAddress').value;
-    const description = document.getElementById('description').value
+    const description = document.getElementById('description').value;
     const payload = {'macAddress': macAddress, 'description': description};
     const header = ['Content-Type', 'application/json'];
     const data = JSON.stringify(payload);
     return macreg.makeRequest('POST', macreg.SUBMIT_URL, data, header).then(
-        function(response) {
+        function () {
             const form = document.getElementById('submitForm');
             form.reset();
             macreg.render();
         },
         function (error) {
-            console.log('Could not submit MAC address:\n' + JSON.stringify(error));
             alert(error.response);
 
             switch(error.status) {
