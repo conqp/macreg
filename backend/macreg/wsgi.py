@@ -143,21 +143,6 @@ def login():
     return response
 
 
-@APPLICATION.route('/login', methods=['PUT'])
-def refresh_session():
-    """Performa a login."""
-
-    token = request.json['session']
-
-    try:
-        token = UUID(token)
-    except (TypeError, ValueError):
-        raise InvalidSessionToken()
-
-    session = SESSION_MANAGER.refresh(token)
-    return jsonify(session.to_json())
-
-
 @APPLICATION.route('/mac', methods=['GET'])
 def list_macs():
     """Lists the MAC addresses of the respective user."""
