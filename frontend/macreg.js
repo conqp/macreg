@@ -195,9 +195,19 @@ macreg._delete = function (id) {
 };
 
 
+/*
+  Initializes the login page.
+*/
+macreg.loginInit = function () {
+    document.removeEventListener("DOMContentLoaded", macreg.loginInit);
+    document.getElementById('btnLogin').addEventListener('click', function(event) {
+        event.preventDefault();
+    });
+};
+
 
 /*
-  Runs on submit.html.
+  Initializes the submit page.
 */
 macreg.submitInit = function () {
     document.removeEventListener('DOMContentLoaded', macreg.submitInit);
