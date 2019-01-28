@@ -199,7 +199,7 @@ macreg._delete = function (id) {
   Initializes the login page.
 */
 macreg.loginInit = function () {
-    document.removeEventListener("DOMContentLoaded", macreg.loginInit);
+    document.removeEventListener('DOMContentLoaded', macreg.loginInit);
     document.getElementById('btnLogin').addEventListener('click', function(event) {
         event.preventDefault();
     });
