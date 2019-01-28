@@ -20,7 +20,8 @@
         </div>
         <div class="form-group">
           <label for="password">Password</label>
-          <input type="password" class="form-control" id="password" placeholder="Password">
+          <input type="password" class="form-control" id="password" aria-describedby="passwordHelp" placeholder="Password">
+          <small id="passwordHelp" class="form-text text-muted">Never give your password to somebody else.</small>
         </div>
         <button id="btnLogin" onclick="macreg.login();" type="submit" class="btn btn-primary btn-block">Login</button>
       </form>
