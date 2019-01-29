@@ -110,7 +110,7 @@ class MACList(_MacRegModel):
         database = DATABASE
         table_name = 'mac_list'
 
-    user_name = CharField(255, unique=True)
+    user_name = CharField(255)
     mac_address = FixedCharField(17, unique=True)
     ipv4address = IPv4AddressField(null=True)
     timestamp = DateTimeField(default=datetime.now)
