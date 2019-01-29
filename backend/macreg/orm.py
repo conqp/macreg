@@ -1,7 +1,7 @@
 """Object relational mappings."""
 
 from datetime import datetime
-from ipaddress import IPv4Network
+from ipaddress import IPv4Address, IPv4Network
 from itertools import chain
 from os import linesep
 from re import compile  # pylint: disable=W0622
@@ -34,6 +34,10 @@ host {name} {{
 IGNORE_FIELDS = ('user_name', 'mac_address', 'ipv4address', 'timestamp')
 MAC_PATTERN = compile('^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$')
 NETWORK = IPv4Network(CONFIG['network']['network'])
+ADDR_MAX = CONFIG['network'].get('addr_max')
+
+if ADDR_MAX:
+    ADDR_MAX = IPv4Address(ADDR_MAX)
 
 
 def create_tables(safe=True):
@@ -148,6 +152,9 @@ class MACList(_MacRegModel):
         ipv4addresses = frozenset(cls.ipv4addresses())
 
         for ipv4address in NETWORK:
+            if ADDR_MAX and ipv4address > ADDR_MAX:
+                raise NetworkExhausted('Maximum IPv4 address reached.')
+
             if ipv4address not in ipv4addresses:
                 return ipv4address
 

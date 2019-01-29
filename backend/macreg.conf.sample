@@ -6,6 +6,7 @@ passwd = yourdbpassword
 
 [network]
 network = 192.168.0.0/24
+addr_max = 192.168.0.250
 
 [admins]
 admins = admin1, admin1
