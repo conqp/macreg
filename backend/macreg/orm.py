@@ -112,7 +112,7 @@ class MACList(_MacRegModel):
 
     user_name = CharField(255)
     mac_address = FixedCharField(17, unique=True)
-    ipv4address = IPv4AddressField(null=True)
+    ipv4address = IPv4AddressField(null=True, unique=True)
     timestamp = DateTimeField(default=datetime.now)
     description = CharField(255)
 
