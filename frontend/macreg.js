@@ -82,6 +82,31 @@ macreg.makeRequest = function (method, url, data=null, ...headers) {
 
 
 /*
+    Filters MAC address records.
+*/
+macreg._filter = function* (records) {
+    const filterString = document.getElementById('filter').value.trim();
+
+    if (filterString == '') {
+        yield* records;
+        return;
+    }
+
+    for (let record of records) {
+        let matchDate = record.timestamp.includes(filterString);
+        let matchUserName = record.userName.includes(filterString);
+        let matchMacAddress = record.macAddress.includes(filterString);
+        let matchDescription = record.description.includes(filterString);
+        let matchIpv4address = record.ipv4address.includes(filterString);
+
+        if (matchDate || matchUserName || matchMacAddress || matchDescription || matchIpv4address) {
+            yield record;
+        }
+    }
+};
+
+
+/*
     Creates a toggle button for the respective record.
 */
 macreg._toggleButton = function (record) {
@@ -125,8 +150,9 @@ macreg._deleteButton = function (record) {
 macreg._render = function (response) {
     const container = document.getElementById('records');
     container.innerHTML = '';
+    const records = macreg._filter(response.response);
 
-    for (let record of response.response) {
+    for (let record of records) {
         let row = document.createElement('tr');
         let fields = [
             record.timestamp,
@@ -214,6 +240,7 @@ macreg.submitInit = function () {
     document.getElementById('btnSubmit').addEventListener('click', function(event) {
         event.preventDefault();
     });
+    document.getElementById('filter').addEventListener('change', macreg.render);
     return macreg.render();
 };
 
