@@ -7,7 +7,7 @@ This repository contains macreg, as well as parts of the [bootrap](https://getbo
 
 ## macreg
 macreg
-Copyright (C) 2018  Richard Neumann <mail at richard dash neumann period de>
+Copyright (C) 2018-2019  Richard Neumann <mail at richard dash neumann period de>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
