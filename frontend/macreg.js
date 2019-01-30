@@ -222,6 +222,7 @@ macreg.loginInit = function () {
     document.removeEventListener('DOMContentLoaded', macreg.loginInit);
     document.getElementById('btnLogin').addEventListener('click', function(event) {
         event.preventDefault();
+        macreg.login();
     });
 };
 
@@ -233,6 +234,7 @@ macreg.submitInit = function () {
     document.removeEventListener('DOMContentLoaded', macreg.submitInit);
     document.getElementById('btnSubmit').addEventListener('click', function(event) {
         event.preventDefault();
+        macreg.submit();
     });
     document.getElementById('filter').addEventListener('change', macreg.render);
     return macreg.render();
