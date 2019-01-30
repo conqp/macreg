@@ -67,7 +67,7 @@ def list_(options):
     if enabled and not disabled:
         condition = ~(MACList.ipv4address >> None)
     elif disabled and not enabled:
-        condition = MACList.enabled >> None
+        condition = MACList.ipv4address >> None
     else:
         condition = True
 
