@@ -188,19 +188,22 @@ macreg._render = function (response) {
 
 
 /*
+    Handles common request errors.
+*/
+macreg._handleError = function (error) {
+    alert(error.response);
+
+    if (error.status == 401) {  // Session expired.
+        window.location = 'index.html';
+    }
+};
+
+
+/*
   Toggles a MAC address between enabled / disabled.
 */
 macreg._toggle = function (id) {
-    return macreg.makeRequest('PATCH', macreg.SUBMIT_URL + '/' + id).then(
-        macreg.render,
-        function (error) {
-            alert(error.response);
-
-            if (error.status == 401) {
-                window.location = 'index.html';
-            }
-        }
-    );
+    return macreg.makeRequest('PATCH', macreg.SUBMIT_URL + '/' + id).then(macreg.render, macreg._handleError);
 };
 
 
@@ -208,16 +211,7 @@ macreg._toggle = function (id) {
     Deletes a MAC address.
 */
 macreg._delete = function (id) {
-    return macreg.makeRequest('DELETE', macreg.SUBMIT_URL + '/' + id).then(
-        macreg.render,
-        function (error) {
-            alert(error.response);
-
-            if (error.status == 401) {
-                window.location = 'index.html';
-            }
-        }
-    );
+    return macreg.makeRequest('DELETE', macreg.SUBMIT_URL + '/' + id).then(macreg.render, macreg._handleError);
 };
 
 
@@ -249,16 +243,7 @@ macreg.submitInit = function () {
   Renders the page.
 */
 macreg.render = function () {
-    return macreg.makeRequest('GET', macreg.SUBMIT_URL).then(
-        macreg._render,
-        function (error) {
-            if (error.status == 401) {
-                // Session expired.
-                alert(error.response);
-                window.location = 'index.html';
-            }
-        }
-    );
+    return macreg.makeRequest('GET', macreg.SUBMIT_URL).then(macreg._render, macreg._handleError);
 };
 
 
@@ -276,7 +261,7 @@ macreg.login = function () {
             window.location = 'submit.html';
         },
         function (error) {
-            alert(error.response || 'Anmeldung fehlgeschlagen.');
+            alert(error.response || 'Login failed.');
         }
     );
 };
@@ -293,20 +278,16 @@ macreg.submit = function () {
     const data = JSON.stringify(payload);
     return macreg.makeRequest('POST', macreg.SUBMIT_URL, data, header).then(
         function () {
-            const form = document.getElementById('submitForm');
-            form.reset();
+            document.getElementById('submitForm').reset();
             macreg.render();
         },
         function (error) {
             alert(error.response);
 
-            switch(error.status) {
-            case 401:
+            if (error.status == 401) {
                 window.location = 'index.html';
-                break;
-            default:
+            } else {
                 macreg.render();
-                break;
             }
         }
     );
