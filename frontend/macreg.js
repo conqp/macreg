@@ -115,10 +115,10 @@ macreg._toggleButton = function (record) {
     buttonToggle.setAttribute('data-id', record.id);
 
     if (record.ipv4address == null) {
-        buttonToggle.setAttribute('class', 'btn btn-success macreg-toggle');
+        buttonToggle.setAttribute('class', 'w3-button w3-green macreg-toggle');
         buttonToggle.textContent = 'Enable';
     } else {
-        buttonToggle.setAttribute('class', 'btn btn-warning macreg-toggle');
+        buttonToggle.setAttribute('class', 'w3-button w3-orange macreg-toggle');
         buttonToggle.textContent = 'Disable';
     }
 
@@ -133,11 +133,8 @@ macreg._toggleButton = function (record) {
 macreg._deleteButton = function (record) {
     const column = document.createElement('td');
     const buttonDelete = document.createElement('button');
-    buttonDelete.setAttribute('class', 'btn btn-danger macreg-delete');
+    buttonDelete.setAttribute('class', 'w3-button w3-red macreg-delete');
     buttonDelete.setAttribute('data-id', record.id);
-    buttonDelete.setAttribute('data-toggle', 'tooltip');
-    buttonDelete.setAttribute('data-placement', 'top');
-    buttonDelete.setAttribute('title', 'Delete this MAC address.');
     buttonDelete.textContent = 'Delete';
     column.appendChild(buttonDelete);
     return column;

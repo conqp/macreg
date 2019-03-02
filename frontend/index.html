@@ -8,22 +8,13 @@
     document.addEventListener('DOMContentLoaded', macreg.loginInit);
   </script>
 </head>
-<div class="w3-container w3-display-container">
-  <div class="w3-row w3-display-topmiddle">
-    <div class="w3-col m4 12">
-      <h1>Login</h1>
-      <form>
-        <div class="form-group">
-          <label for="userName">User Name</label>
-          <input type="text" class="form-control" id="userName" placeholder="Your local user name">
-        </div>
-        <div class="form-group">
-          <label for="password">Password</label>
-          <input type="password" class="form-control" id="password" placeholder="Your local user's password">
-        </div>
-        <br/>
-        <button id="btnLogin" type="submit" class="w3-button w3-green">Login</button>
-      </form>
-    </div>
-  </div>
+<div class="w3-container w3-teal">
+  <h1 class="">Login</h1>
 </div>
+
+<form class="w3-container">
+  <input type="text" class="w3-input" id="userName" placeholder="User name.">
+  <input type="password" class="w3-input" id="password" placeholder="Password.">
+  <br/>
+  <button id="btnLogin" type="submit" class="w3-button w3-green">Login</button>
+</form>
