@@ -15,7 +15,7 @@ emails = mail@admin1.com, mail@admin2.com
 [email]
 sender = automailer@yourdomain.com
 subject = New MAC address registered
-body = User {user_name} has request to enable MAC address {mac_address} for {description}.
+body = User {user_name} has requested to enable MAC address {mac_address} for {description}.
 
 [smtp]
 server = smtp.youremailprovider.com

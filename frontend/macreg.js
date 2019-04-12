@@ -16,7 +16,7 @@
 */
 'use strict';
 
-var macreg = macreg || {};
+const macreg = {};
 
 macreg.LOGIN_URL = 'login';
 macreg.SUBMIT_URL = 'mac';
@@ -25,7 +25,7 @@ macreg.SUBMIT_URL = 'mac';
 /*
   Makes a request returning a promise.
 */
-macreg.makeRequest = function (method, url, data=null, ...headers) {
+macreg.makeRequest = function (method, url, data = null, headers = {}) {
     function parseResponse (response) {
         try {
             return JSON.parse(response);
@@ -63,8 +63,8 @@ macreg.makeRequest = function (method, url, data=null, ...headers) {
         xhr.withCredentials = true;
         xhr.open(method, url);
 
-        for (let header of headers) {
-            xhr.setRequestHeader(...header);
+        for (const header in headers) {
+            xhr.setRequestHeader(header, headers[header]);
         }
 
         xhr.onload = onload;
@@ -92,7 +92,7 @@ macreg._filter = function* (records) {
         return;
     }
 
-    for (let record of records) {
+    for (const record of records) {
         let matchDate = record.timestamp.includes(filterString);
         let matchUserName = record.userName.includes(filterString);
         let matchMacAddress = record.macAddress.includes(filterString);
@@ -149,7 +149,7 @@ macreg._render = function (response) {
     container.innerHTML = '';
     const records = macreg._filter(response.response);
 
-    for (let record of records) {
+    for (const record of records) {
         let row = document.createElement('tr');
         let fields = [
             record.timestamp,
@@ -159,7 +159,7 @@ macreg._render = function (response) {
             record.ipv4address || 'N/A'
         ];
 
-        for (let field of fields) {
+        for (const field of fields) {
             let column = document.createElement('td');
             column.textContent = field;
             row.appendChild(column);
@@ -170,13 +170,13 @@ macreg._render = function (response) {
         container.appendChild(row);
     }
 
-    for (let button of document.getElementsByClassName('macreg-toggle')) {
+    for (const button of document.getElementsByClassName('macreg-toggle')) {
         button.addEventListener('click', function() {
             macreg._toggle(button.getAttribute('data-id'));
         });
     }
 
-    for (let button of document.getElementsByClassName('macreg-delete')) {
+    for (const button of document.getElementsByClassName('macreg-delete')) {
         button.addEventListener('click', function() {
             macreg._delete(button.getAttribute('data-id'));
         });
@@ -252,10 +252,10 @@ macreg.render = function () {
 macreg.login = function () {
     const userName = document.getElementById('userName').value;
     const password = document.getElementById('password').value;
-    const header = ['Content-Type', 'application/json'];
+    const headers = {'Content-Type': 'application/json'};
     const payload = {'userName': userName, 'passwd': password};
     const data = JSON.stringify(payload);
-    return macreg.makeRequest('POST', macreg.LOGIN_URL, data, header).then(
+    return macreg.makeRequest('POST', macreg.LOGIN_URL, data, headers).then(
         function () {
             window.location = 'submit.html';
         },
@@ -273,9 +273,9 @@ macreg.submit = function () {
     const macAddress = document.getElementById('macAddress').value;
     const description = document.getElementById('description').value;
     const payload = {'macAddress': macAddress.trim(), 'description': description.trim()};
-    const header = ['Content-Type', 'application/json'];
+    const headers = {'Content-Type': 'application/json'};
     const data = JSON.stringify(payload);
-    return macreg.makeRequest('POST', macreg.SUBMIT_URL, data, header).then(
+    return macreg.makeRequest('POST', macreg.SUBMIT_URL, data, headers).then(
         function () {
             document.getElementById('submitForm').reset();
             macreg.render();
